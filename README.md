@@ -30,7 +30,7 @@ Sistema inteligente de análisis de movimiento corporal en tiempo real capaz de 
 
 1. Clonar el repositorio:
    ```
-   git clone https://github.com/yourusername/sistema_anotacion_video.git
+   git clone https://github.com/AndresPin0/sistema_anotacion_video.git
    cd sistema_anotacion_video
    ```
 
