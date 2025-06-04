@@ -59,7 +59,7 @@ sistema_anotacion_video/
 
 1. **Clonar el repositorio**:
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/AndresPin0/sistema_anotacion_video.git
 cd sistema_anotacion_video
 ```
 
@@ -92,10 +92,25 @@ videos/
 │   ├── video2.mp4
 │   └── video3.mp4
 ├── caminar_regreso/
+│   ├── video1.mp4
+│   ├── video2.mp4
+│   └── video3.mp4
 ├── girar_90/
+│   ├── video1.mp4
+│   ├── video2.mp4
+│   └── video3.mp4
 ├── girar_180/
+│   ├── video1.mp4
+│   ├── video2.mp4
+│   └── video3.mp4
 ├── sentarse/
+│   ├── video1.mp4
+│   ├── video2.mp4
+│   └── video3.mp4
 └── ponerse_de_pie/
+│   ├── video1.mp4
+│   ├── video2.mp4
+│   └── video3.mp4
 ```
 
 ### Recomendaciones para Grabación
@@ -140,7 +155,7 @@ python extract_video_features.py
 
 #### Paso 2: Análisis Exploratorio
 ```bash
-python data_analysis.py
+python generate_report_plots.py
 ```
 
 #### Paso 3: Entrenamiento de Modelos
@@ -165,6 +180,28 @@ python src/main.py
 - **Ajuste de umbrales** de detección en tiempo real
 - **Historial de actividades** detectadas
 - **Pistas visuales** para guiar al usuario
+
+## 📷 Capturas del Programa
+
+Aquí se muestran algunas capturas de pantalla del sistema en funcionamiento:
+
+**Caminando hacia la cámara:**
+![Caminando hacia la cámara](docs/caminando_hacia_camara.png)
+
+**Caminando alejándose de la cámara:**
+![Caminando alejándose de la cámara](docs/caminando_regreso_camara.png)
+
+**Girar 90 grados:**
+![Girar 90 grados](docs/girar_90.png)
+
+**Girar 180 grados:**
+![Girar 180 grados](docs/girar_180.png)
+
+**Sentándose:**
+![Sentándose](docs/sentandose.png)
+
+**Poniéndose de pie:**
+![Poniéndose de pie](docs/poniendose_de_pie.png)
 
 ## 📊 Análisis y Resultados
 
@@ -305,20 +342,3 @@ Para contribuir al proyecto:
 - Pose Detection and Activity Recognition using MediaPipe
 - Human Activity Recognition: A Comprehensive Survey
 - Real-time Activity Classification in Video Streams
-
-## 📄 Licencia
-
-Este proyecto se desarrolla como parte del curso de Inteligencia Artificial 1.
-
----
-
-## 👥 Equipo de Desarrollo
-
-**Proyecto Final - IA1**
-- Análisis de actividades humanas en tiempo real
-- Sistema completo de detección y clasificación
-- Interfaz gráfica para uso interactivo
-
----
-
-*Para más información o soporte, consultar la documentación en el código fuente o contactar al equipo de desarrollo.*
