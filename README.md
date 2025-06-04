@@ -1,5 +1,10 @@
 # Sistema de Anotación de Video
 
+## 👥 Integrantes
+
+* [Jhonatan Castaño](https://github.com/JhonatanCI)
+* [Andrés Pino](https://github.com/AndresPin0)
+
 **Proyecto Final - Inteligencia Artificial 1**
 
 Un sistema completo para la detección y clasificación de actividades humanas en tiempo real utilizando MediaPipe y técnicas de aprendizaje automático.
@@ -28,23 +33,36 @@ Este sistema permite analizar videos en tiempo real para detectar y clasificar l
 
 ```
 sistema_anotacion_video/
-├── src/                          # Código fuente principal
-│   ├── __init__.py              # Configuración del módulo
-│   ├── main.py                  # Punto de entrada principal
-│   ├── pose_detection/          # Detección de poses con MediaPipe
-│   ├── activity_classifier/     # Clasificación de actividades
-│   ├── gui/                     # Interfaz gráfica de usuario
-│   ├── video_capture/          # Captura y manejo de video
-│   └── utils/                   # Utilidades auxiliares
-├── videos/                      # Videos de entrenamiento por actividad
-├── data/                        # Datos procesados y características
-├── models/                      # Modelos entrenados y evaluaciones
-├── analysis/                    # Análisis exploratorio de datos
-├── extract_video_features.py   # Extracción de características
-├── train_classifier.py         # Entrenamiento de modelos
-├── data_analysis.py            # Análisis exploratorio
-├── run_pipeline.py             # Pipeline completo automatizado
-└── requirements.txt            # Dependencias del proyecto
+├── src/                          # Código fuente principal del sistema en tiempo real y módulos centrales
+│   ├── __init__.py              # Inicializador del paquete src
+│   ├── main.py                  # Punto de entrada para la aplicación GUI en tiempo real
+│   ├── pose_detection/          # Módulo para la detección de poses con MediaPipe
+│   ├── activity_classifier/     # Módulo para la clasificación de actividades
+│   ├── gui/                     # Módulo para la interfaz gráfica de usuario (PyQt5)
+│   ├── video_capture/          # Módulo para la captura y manejo de video
+│   ├── utils/                   # Utilidades generales y funciones auxiliares
+│   ├── data_analysis/           # (Posiblemente) Módulos auxiliares para análisis de datos
+│   ├── extract_features/        # (Posiblemente) Módulos auxiliares para extracción de características
+│   └── train_classifier/        # (Posiblemente) Módulos auxiliares para entrenamiento de clasificadores
+├── docs/                         # Documentación, incluyendo imágenes, diagramas y reporte en pdf
+│   └── diagramas/               # Diagramas del sistema (bloques, flujo)
+├── videos/                       # Videos de entrada para entrenamiento, organizados por actividad
+├── data/                         # Datos procesados (e.g., características extraídas en CSV)
+├── models/                       # Modelos de Machine Learning entrenados y su evaluación
+│   └── evaluation/              # Reportes de evaluación, comparativas de modelos
+│   └── plots/                   # Gráficos de evaluación de modelos
+├── analysis/                     # Resultados del análisis exploratorio de datos
+│   ├── reports/                 # Reportes de análisis (e.g., analysis_report.txt)
+│   ├── plots/                   # Gráficos y visualizaciones del análisis
+│   └── statistics/              # Estadísticas detalladas de los datos
+├── reports/                      # (Propósito a confirmar, podría ser para reportes generales o logs)
+├── extract_video_features.py   # Script para extraer características de los videos
+├── train_classifier.py         # Script para entrenar los modelos de clasificación
+├── generate_report_plots.py    # Script para generar análisis exploratorio y visualizaciones (antes data_analysis.py)
+├── run_pipeline.py             # Script para ejecutar el pipeline completo (extracción, entrenamiento, evaluación)
+├── requirements.txt            # Dependencias del proyecto Python
+├── README.md                     # Este archivo, con la descripción general del proyecto
+└── .gitignore                    # Especifica archivos y directorios ignorados por Git
 ```
 
 ## 🧱 Diagrama de Bloques del Sistema
@@ -217,19 +235,55 @@ Aquí se muestran algunas capturas de pantalla del sistema en funcionamiento:
 
 ## 📊 Análisis y Resultados
 
-### Análisis Exploratorio
+### Ubicación de los Resultados Detallados
+Los resultados detallados del análisis y la evaluación de modelos se pueden encontrar en los siguientes archivos:
+- **Análisis Exploratorio**:
+    - Reporte completo: `analysis/reports/analysis_report.json`
+    - Visualizaciones y gráficos: `analysis/plots/`
+    - Estadísticas detalladas: `analysis/statistics/`
+- **Evaluación de Modelos**:
+    - Comparación de modelos: `models/evaluation/model_comparison.csv`
+    - Información del mejor modelo: `models/evaluation/best_model_info.json`
+    - Gráficos de evaluación: `models/plots/`
 
-Los resultados del análisis se guardan en:
-- `analysis/reports/analysis_report.txt` - Reporte completo
-- `analysis/plots/` - Visualizaciones y gráficos
-- `analysis/statistics/` - Estadísticas detalladas
+### Resumen del Análisis Exploratorio de Datos
+(Basado en `analysis/reports/analysis_report.json`)
 
-### Evaluación de Modelos
+- **Información General del Dataset**:
+    - Fecha del análisis: 2025-06-04
+    - Total de muestras: 1849
+    - Total de características analizadas: 101
+    - Actividades: `caminarHacia`, `caminarRegreso`, `girar180`, `girar90`, `ponerseDePie`, `sentarse`.
+- **Distribución de Muestras por Actividad**:
+    - `girar180`: 369 muestras
+    - `girar90`: 369 muestras
+    - `caminarHacia`: 355 muestras
+    - `ponerseDePie`: 267 muestras
+    - `sentarse`: 250 muestras
+    - `caminarRegreso`: 239 muestras
+- El reporte completo (`analysis_report.json`) contiene estadísticas descriptivas detalladas (media, desviación estándar, etc.) para cada característica, desglosadas por actividad.
 
-Los resultados del entrenamiento se encuentran en:
-- `models/evaluation/model_comparison.csv` - Comparación de modelos
-- `models/evaluation/best_model_info.json` - Información del mejor modelo
-- `models/plots/` - Gráficos de evaluación
+### Resumen de Evaluación de Modelos
+(Basado en `models/evaluation/model_comparison.csv` y `models/evaluation/best_model_info.json`)
+
+Se evaluaron varios modelos de Machine Learning. La siguiente tabla resume su rendimiento:
+
+| Modelo             | Accuracy | Precision | Recall   | F1-Score |
+| :----------------- | :------- | :-------- | :------- | :------- |
+| RandomForest       | 0.6541   | 0.6563    | 0.6541   | 0.6551   |
+| SVM                | 0.6649   | 0.6599    | 0.6649   | 0.6603   |
+| **LogisticRegression** | **0.6946** | **0.6930**  | **0.6946** | **0.6933** |
+| GradientBoosting   | 0.6757   | 0.6757    | 0.6757   | 0.6757   |
+| KNN                | 0.6649   | 0.6564    | 0.6649   | 0.6598   |
+| XGBoost            | 0.6703   | 0.6705    | 0.6703   | 0.6703   |
+
+- **Mejor Modelo**: `LogisticRegression`
+    - Accuracy: ~69.46%
+    - Precision: ~69.30%
+    - Recall: ~69.46%
+    - F1-Score: ~69.33%
+
+Estos resultados indican que el modelo de Regresión Logística ofreció el mejor rendimiento general para la clasificación de las actividades definidas.
 
 ### Métricas Principales
 
@@ -322,17 +376,6 @@ El proyecto sigue la metodología CRISP-DM:
 - Los logs se muestran en consola durante la ejecución
 - Los errores se guardan en archivos de salida
 - Usar `--verbose` para más información detallada
-
-## 🤝 Contribución
-
-### Desarrollo
-
-Para contribuir al proyecto:
-
-1. Fork del repositorio
-2. Crear rama para nueva funcionalidad
-3. Implementar cambios con tests
-4. Hacer pull request
 
 ### Estructura de Código
 
