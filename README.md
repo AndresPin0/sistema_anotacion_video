@@ -47,6 +47,18 @@ sistema_anotacion_video/
 └── requirements.txt            # Dependencias del proyecto
 ```
 
+## 🧱 Diagrama de Bloques del Sistema
+
+![Diagrama de Bloques del Sistema](docs/diagramas/diagrama_bloques_sistema.png)
+
+## ⚙️ Diagrama de Flujo: Pipeline de Entrenamiento
+
+![Diagrama de Flujo: Pipeline de Entrenamiento](docs/diagramas/diagrama_flujo_pipeline_entrenamiento.png)
+
+## 👁️ Diagrama de Flujo: Detección de Actividad en Tiempo Real
+
+![Diagrama de Flujo: Detección de Actividad en Tiempo Real](docs/diagramas/diagrama_flujo_pipeline_deteccion_tiempo_real.png)
+
 ## 🚀 Instalación y Configuración
 
 ### Prerequisitos
