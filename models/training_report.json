@@ -1,0 +1,65 @@
+{
+  "training_info": {
+    "timestamp": "2025-06-04T01:16:35.802509",
+    "data_source": "data/training_data",
+    "total_samples": 1849,
+    "training_samples": 1479,
+    "test_samples": 370,
+    "num_features": 50,
+    "num_classes": 6,
+    "classes": [
+      "caminarHacia",
+      "caminarRegreso",
+      "girar180",
+      "girar90",
+      "ponerseDePie",
+      "sentarse"
+    ]
+  },
+  "models_trained": [
+    "RandomForest",
+    "SVM",
+    "LogisticRegression",
+    "GradientBoosting",
+    "KNN",
+    "XGBoost"
+  ],
+  "evaluation_summary": {
+    "RandomForest": {
+      "accuracy": 0.654054054054054,
+      "precision": 0.6563351663351663,
+      "recall": 0.654054054054054,
+      "f1_score": 0.6550582577109
+    },
+    "SVM": {
+      "accuracy": 0.6648648648648648,
+      "precision": 0.659884744683135,
+      "recall": 0.6648648648648648,
+      "f1_score": 0.6602783159004357
+    },
+    "LogisticRegression": {
+      "accuracy": 0.6945945945945946,
+      "precision": 0.69302380967846,
+      "recall": 0.6945945945945946,
+      "f1_score": 0.6933103650960794
+    },
+    "GradientBoosting": {
+      "accuracy": 0.6756756756756757,
+      "precision": 0.6757064558515001,
+      "recall": 0.6756756756756757,
+      "f1_score": 0.6756615014718543
+    },
+    "KNN": {
+      "accuracy": 0.6648648648648648,
+      "precision": 0.6564391487683876,
+      "recall": 0.6648648648648648,
+      "f1_score": 0.6597648065495902
+    },
+    "XGBoost": {
+      "accuracy": 0.6702702702702703,
+      "precision": 0.6704668304668304,
+      "recall": 0.6702702702702703,
+      "f1_score": 0.670265163122306
+    }
+  }
+}

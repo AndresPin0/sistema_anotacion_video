@@ -1,0 +1,42 @@
+{
+  "missing_data": {
+    "total_missing_values": 992,
+    "features_with_missing": 42,
+    "percentage_missing": 0.5109583043601432,
+    "worst_features": {
+      "nose_acceleration_x": 1.7306652244456464,
+      "nose_acceleration_y": 1.7306652244456464,
+      "nose_acceleration_z": 1.7306652244456464,
+      "nose_acceleration_total": 1.7306652244456464,
+      "left_hip_acceleration_x": 1.7306652244456464,
+      "left_hip_acceleration_y": 1.7306652244456464,
+      "left_hip_acceleration_z": 1.7306652244456464,
+      "left_hip_acceleration_total": 1.7306652244456464,
+      "right_hip_acceleration_x": 1.7306652244456464,
+      "right_hip_acceleration_y": 1.7306652244456464
+    }
+  },
+  "duplicates": {
+    "total_duplicates": 0,
+    "percentage_duplicates": 0.0
+  },
+  "constant_features": {
+    "count": 2,
+    "features": [
+      "torso_lean_angle",
+      "shoulder_angle"
+    ]
+  },
+  "class_distribution": {
+    "class_counts": {
+      "girar180": 369,
+      "girar90": 369,
+      "caminarHacia": 355,
+      "ponerseDePie": 267,
+      "sentarse": 250,
+      "caminarRegreso": 239
+    },
+    "imbalance_ratio": 1.5439330543933054,
+    "is_balanced": true
+  }
+}

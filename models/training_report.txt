@@ -1,0 +1,61 @@
+REPORTE DE ENTRENAMIENTO - SISTEMA DE ANOTACIÓN DE VIDEO
+============================================================
+
+Fecha: 2025-06-04 01:16:35
+Directorio de datos: data/training_data
+Directorio de salida: models
+
+INFORMACIÓN DEL DATASET:
+- Total de muestras: 1849
+- Muestras de entrenamiento: 1479
+- Muestras de prueba: 370
+- Número de características: 50
+- Número de clases: 6
+- Clases: caminarHacia, caminarRegreso, girar180, girar90, ponerseDePie, sentarse
+
+MODELOS ENTRENADOS:
+- RandomForest
+- SVM
+- LogisticRegression
+- GradientBoosting
+- KNN
+- XGBoost
+
+RESULTADOS DE EVALUACIÓN:
+----------------------------------------
+RandomForest:
+  Accuracy:  0.6541
+  Precision: 0.6563
+  Recall:    0.6541
+  F1-Score:  0.6551
+
+SVM:
+  Accuracy:  0.6649
+  Precision: 0.6599
+  Recall:    0.6649
+  F1-Score:  0.6603
+
+LogisticRegression:
+  Accuracy:  0.6946
+  Precision: 0.6930
+  Recall:    0.6946
+  F1-Score:  0.6933
+
+GradientBoosting:
+  Accuracy:  0.6757
+  Precision: 0.6757
+  Recall:    0.6757
+  F1-Score:  0.6757
+
+KNN:
+  Accuracy:  0.6649
+  Precision: 0.6564
+  Recall:    0.6649
+  F1-Score:  0.6598
+
+XGBoost:
+  Accuracy:  0.6703
+  Precision: 0.6705
+  Recall:    0.6703
+  F1-Score:  0.6703
+

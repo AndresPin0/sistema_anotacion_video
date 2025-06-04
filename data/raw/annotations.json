@@ -1,0 +1,19 @@
+{
+    "videos": [
+        {
+            "filename": "test_video.mp4",
+            "activity": "caminar_hacia",
+            "start_frame": 0,
+            "end_frame": 30,
+            "fps": 30
+        }
+    ],
+    "activities": [
+        "caminar_hacia",
+        "caminar_regreso",
+        "girar_90",
+        "girar_180",
+        "sentarse",
+        "ponerse_pie"
+    ]
+} 

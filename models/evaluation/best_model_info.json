@@ -1,0 +1,11 @@
+{
+  "best_model": "LogisticRegression",
+  "metrics": {
+    "Model": "LogisticRegression",
+    "Accuracy": 0.6945945945945946,
+    "Precision": 0.69302380967846,
+    "Recall": 0.6945945945945946,
+    "F1-Score": 0.6933103650960794
+  },
+  "timestamp": "2025-06-04T01:16:35.802291"
+}
