@@ -1,4 +1,4 @@
- #!/usr/bin/env python3
+ 
 """
 Extractor de Características de Video
 ==================================
@@ -25,7 +25,7 @@ class VideoProcessor:
         self.pose = self.mp_pose.Pose(
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5,
-            model_complexity=2  # Usar modelo más preciso
+            model_complexity=2  
         )
         self.feature_extractor = FeatureExtractor()
         
@@ -38,16 +38,16 @@ class VideoProcessor:
         Returns:
             Dict[str, np.ndarray]: Diccionario de landmarks
         """
-        # Convertir BGR a RGB
+        
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
-        # Procesar frame
+        
         results = self.pose.process(frame_rgb)
         
         if not results.pose_landmarks:
             return None
             
-        # Convertir landmarks a diccionario
+        
         landmarks = {}
         for idx, landmark in enumerate(results.pose_landmarks.landmark):
             name = self.mp_pose.PoseLandmark(idx).name.lower()
@@ -72,10 +72,10 @@ class VideoProcessor:
             if not ret:
                 break
                 
-            # Extraer landmarks
+            
             landmarks = self._extract_landmarks(frame)
             if landmarks is not None:
-                # Extraer características
+                
                 features = self.feature_extractor.extract_features(landmarks)
                 features_list.append(features)
                 
@@ -91,34 +91,34 @@ def process_dataset(data_dir: str = "data/raw",
         data_dir: Directorio con los videos y anotaciones
         output_dir: Directorio para guardar las características procesadas
     """
-    # Crear directorios
+    
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     
-    # Cargar anotaciones
+    
     annotations_file = Path(data_dir) / "annotations.json"
     with open(annotations_file, "r") as f:
         annotations = json.load(f)
     
-    # Inicializar procesador
+    
     processor = VideoProcessor()
     
-    # Listas para almacenar características y etiquetas
+    
     all_features = []
     all_labels = []
     
-    # Procesar cada video
+    
     print("\nProcesando videos...")
     for video_info in tqdm(annotations):
         video_path = str(Path(data_dir) / video_info["filename"])
         label = video_info["activity"]
         
         try:
-            # Extraer características del video
+            
             video_features = processor.process_video(video_path)
             
             if video_features:
-                # Calcular características promedio del video
+                
                 avg_features = {}
                 for feature_name in video_features[0].keys():
                     avg_features[feature_name] = np.mean([
@@ -132,25 +132,25 @@ def process_dataset(data_dir: str = "data/raw",
             print(f"\n⚠️  Error procesando {video_path}: {e}")
             continue
     
-    # Convertir a arrays
+    
     X = np.array(all_features)
     y = np.array(all_labels)
     
-    # Guardar características y etiquetas
+    
     np.save(output_path / "features.npy", X)
     np.save(output_path / "labels.npy", y)
     
-    # Guardar nombres de características
+    
     feature_names = processor.feature_extractor.get_feature_names()
     with open(output_path / "feature_names.json", "w") as f:
         json.dump(feature_names, f, indent=4)
     
-    # Generar estadísticas
+    
     print("\nEstadísticas del dataset procesado:")
     print(f"- Total de muestras: {len(all_features)}")
     print(f"- Características por muestra: {len(feature_names)}")
     
-    # Distribución de clases
+    
     unique_labels, counts = np.unique(y, return_counts=True)
     print("\nDistribución de clases:")
     for label, count in zip(unique_labels, counts):

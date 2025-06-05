@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Script de Entrenamiento Mejorado
 ==============================
@@ -84,18 +84,18 @@ def train_model(X_train: np.ndarray, y_train: np.ndarray,
         params: Hiperparámetros optimizados
         model_dir: Directorio para guardar el modelo
     """
-    # Crear directorio si no existe
+    
     model_path = Path(model_dir)
     model_path.mkdir(parents=True, exist_ok=True)
     
-    # Entrenar modelo final
+    
     dtrain = xgb.DMatrix(X_train, label=y_train)
     model = xgb.train(params, dtrain)
     
-    # Guardar modelo
+    
     model.save_model(str(model_path / "xgboost_model.json"))
     
-    # Guardar hiperparámetros
+    
     with open(model_path / "hyperparameters.json", "w") as f:
         json.dump(params, f, indent=4)
 
@@ -111,21 +111,21 @@ def evaluate_model(model: xgb.Booster, X_test: np.ndarray, y_test: np.ndarray,
         class_names: Nombres de las clases
         output_dir: Directorio para guardar reportes
     """
-    # Crear directorio si no existe
+    
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     
-    # Predicciones
+    
     dtest = xgb.DMatrix(X_test)
     y_pred_proba = model.predict(dtest)
     y_pred = np.argmax(y_pred_proba, axis=1)
     
-    # Generar reporte de clasificación
+    
     report = classification_report(y_test, y_pred, target_names=class_names)
     with open(output_path / "classification_report.txt", "w") as f:
         f.write(report)
     
-    # Matriz de confusión
+    
     plt.figure(figsize=(10, 8))
     cm = confusion_matrix(y_test, y_pred)
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
@@ -137,7 +137,7 @@ def evaluate_model(model: xgb.Booster, X_test: np.ndarray, y_test: np.ndarray,
     plt.savefig(output_path / "confusion_matrix.png")
     plt.close()
     
-    # Importancia de características
+    
     importance_scores = model.get_score(importance_type='gain')
     importance_df = pd.DataFrame.from_dict(importance_scores, orient='index', 
                                          columns=['importance'])
@@ -158,35 +158,35 @@ def main():
     print("ENTRENAMIENTO DE MODELO MEJORADO")
     print("=" * 60)
     
-    # 1. Cargar datos
+    
     print("\n1. Cargando dataset...")
     X, y = load_dataset()
     
-    # 2. Dividir datos
+    
     print("\n2. Dividiendo datos en train/test...")
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
     
-    # 3. Preprocesamiento
+    
     print("\n3. Aplicando preprocesamiento...")
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     
-    # Guardar scaler
+    
     joblib.dump(scaler, "models/trained_models/scaler.joblib")
     
-    # 4. Optimización de hiperparámetros
+    
     print("\n4. Optimizando hiperparámetros...")
     best_params = optimize_hyperparameters(X_train_scaled, y_train)
     print(f"Mejores hiperparámetros encontrados: {best_params}")
     
-    # 5. Entrenamiento final
+    
     print("\n5. Entrenando modelo final...")
     train_model(X_train_scaled, y_train, best_params)
     
-    # 6. Evaluación
+    
     print("\n6. Evaluando modelo...")
     model = xgb.Booster()
     model.load_model("models/trained_models/xgboost_model.json")

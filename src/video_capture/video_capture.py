@@ -22,7 +22,7 @@ class VideoCapture:
             if not self.cap.isOpened():
                 raise ValueError(f"No se pudo abrir la cámara {self.camera_id}")
             
-            # Configurar resolución (opcional)
+            
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         return self.cap.isOpened()
@@ -51,32 +51,32 @@ class VideoCapture:
         return ret, frame, timestamp
 
 
-# Ejemplo de uso
+
 if __name__ == "__main__":
-    # Crear instancia del capturador de video
+    
     video_capture = VideoCapture()
     
     try:
-        # Iniciar cámara
+        
         video_capture.start_camera()
         
         print("Presiona 'q' para salir")
         
         while True:
-            # Capturar frame
+            
             ret, frame, timestamp = video_capture.get_frame()
             if not ret:
                 break
             
-            # Mostrar el frame
+            
             cv2.imshow('Video Capture', frame)
             
-            # Procesar teclas
+            
             key = cv2.waitKey(1) & 0xFF
             if key == ord('q'):
                 break
     
     finally:
-        # Limpiar recursos
+        
         video_capture.stop_camera()
         cv2.destroyAllWindows() 

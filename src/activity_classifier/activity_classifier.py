@@ -53,7 +53,7 @@ class SimpleActivityClassifier:
         Returns:
             str: Actividad predicha
         """
-        # Si no hay landmarks, no podemos predecir
+        
         if not landmarks_dict or not angles_dict:
             print("ADVERTENCIA: Sin landmarks o ángulos para procesar.")
             return "desconocida"
@@ -133,7 +133,7 @@ class SimpleActivityClassifier:
             current = self.position_history[-1]
             previous = self.position_history[0]
             time_diff = current["timestamp"] - previous["timestamp"]
-            if time_diff > 0:  # evitar división por cero
+            if time_diff > 0:  
                 z_velocity = (current["nose_z"] - previous["nose_z"]) / time_diff
                 hip_y_velocity = (current["hip_y"] - previous["hip_y"]) / time_diff
         
@@ -143,19 +143,19 @@ class SimpleActivityClassifier:
         
         activities_detected = []
         
-        # 1. DETECCIÓN DE CAMINAR
-        # Reglas basadas en coordenada Z de la nariz
+        
+        
         if 'nose' in landmarks and 'z' in landmarks['nose']:
-            # Usar tanto la posición como la velocidad para detección más precisa
+            
             if nose_z < -self.thresholds["z_threshold"] or z_velocity < -self.thresholds["z_threshold"]:
-                activities_detected.append(("caminarHacia", 5, abs(nose_z) + abs(z_velocity)))  # Prioridad 5, confianza basada en magnitud
+                activities_detected.append(("caminarHacia", 5, abs(nose_z) + abs(z_velocity)))  
             elif nose_z > self.thresholds["z_threshold"] or z_velocity > self.thresholds["z_threshold"]:
                 activities_detected.append(("caminarRegreso", 5, abs(nose_z) + abs(z_velocity)))
         
-        # 2. DETECCIÓN DE GIROS
-        # Si tenemos landmarks previos, podemos detectar giros
+        
+        
         if self.last_landmarks and 'left_shoulder' in landmarks and 'right_shoulder' in landmarks:
-            # Vector de hombros actual y anterior
+            
             shoulder_vector_current = {
                 'x': landmarks['left_shoulder']['x'] - landmarks['right_shoulder']['x'],
                 'y': landmarks['left_shoulder']['y'] - landmarks['right_shoulder']['y']
@@ -166,37 +166,37 @@ class SimpleActivityClassifier:
                 'y': self.last_landmarks['left_shoulder']['y'] - self.last_landmarks['right_shoulder']['y']
             }
             
-            # Calcular cambio en la orientación 
+            
             orientation_change = self._calculate_angle_between_vectors(
                 shoulder_vector_current,
                 shoulder_vector_prev
             )
             
             if orientation_change > self.thresholds["orientation_threshold"]:
-                # Detectó un giro
+                
                 if orientation_change > self.thresholds["orientation_threshold_large"]:
-                    activities_detected.append(("girar180", 8, orientation_change))  # Prioridad más alta
+                    activities_detected.append(("girar180", 8, orientation_change))  
                 else:
                     activities_detected.append(("girar90", 6, orientation_change))
         
-        # 3. DETECCIÓN DE SENTARSE/LEVANTARSE
-        # Basado en ángulo de rodillas y movimiento vertical de cadera
+        
+        
         if avg_knee_angle < self.thresholds["knee_angle_threshold"]:
-            # Rodillas dobladas, verificar dirección de movimiento
+            
             if hip_y_velocity > self.thresholds["hip_movement_threshold"]:
-                # Movimiento de cadera hacia abajo = sentarse
+                
                 activities_detected.append(("sentarse", 7, hip_y_velocity * 100))
             elif hip_y_velocity < -self.thresholds["hip_movement_threshold"]:
-                # Movimiento de cadera hacia arriba = levantarse
+                
                 activities_detected.append(("ponerseDePie", 7, abs(hip_y_velocity) * 100))
         
-        # Elegir la actividad con mayor prioridad y confianza
+        
         if activities_detected:
-            # Ordenar por prioridad (descendente) y confianza (descendente)
+            
             activities_detected.sort(key=lambda x: (x[1], x[2]), reverse=True)
             return activities_detected[0][0]
         
-        # Si no detectamos nada, devolver desconocida
+        
         return "desconocida"
     
     def _calculate_angle_between_vectors(self, vector1, vector2):
@@ -230,11 +230,11 @@ class SimpleActivityClassifier:
         print(f"Predicción actual RAW: {prediction}")
         print(f"Historial de predicciones: {self.prediction_history}")
         
-        # Datos relevantes para cada actividad
+        
         if 'nose' in landmarks and 'z' in landmarks['nose']:
             nose_z = landmarks['nose']['z']
             
-            # Calcular velocidad si hay suficiente historial
+            
             z_velocity = 0
             if len(self.position_history) >= 2:
                 current = self.position_history[-1]
@@ -247,19 +247,19 @@ class SimpleActivityClassifier:
             print(f"  • caminarHacia: Z < -{self.thresholds['z_threshold']} o velocidad Z < -{self.thresholds['z_threshold']}")
             print(f"  • caminarRegreso: Z > {self.thresholds['z_threshold']} o velocidad Z > {self.thresholds['z_threshold']}")
             
-            # Comprobar si debería detectar alguna actividad
+            
             if abs(nose_z) > self.thresholds['z_threshold'] or abs(z_velocity) > self.thresholds['z_threshold']:
-                color = '\033[92m'  # verde
+                color = '\033[92m'  
                 direction = "HACIA CÁMARA" if (nose_z < -self.thresholds['z_threshold'] or z_velocity < -self.thresholds['z_threshold']) else "ALEJARSE"
                 print(f"{color}¡DEBERÍA DETECTAR CAMINAR {direction}! Z={nose_z:.4f}, Velocidad={z_velocity:.4f}\033[0m")
         
-        # Ángulos de rodilla para sentarse/levantarse
+        
         if "left_knee_angle" in angles and "right_knee_angle" in angles:
             left_knee = angles["left_knee_angle"]
             right_knee = angles["right_knee_angle"]
             avg_knee = (left_knee + right_knee) / 2
             
-            # Calcular velocidad vertical de cadera
+            
             hip_y_velocity = 0
             if len(self.position_history) >= 2:
                 current = self.position_history[-1]
@@ -272,14 +272,14 @@ class SimpleActivityClassifier:
             print(f"  • Movimiento vertical cadera: {hip_y_velocity:.6f} (Umbral: ±{self.thresholds['hip_movement_threshold']:.6f})")
             
             if avg_knee < self.thresholds['knee_angle_threshold']:
-                color = '\033[92m'  # verde
+                color = '\033[92m'  
                 print(f"{color}¡RODILLAS FLEXIONADAS! Ángulo={avg_knee:.2f}°\033[0m")
                 
                 if abs(hip_y_velocity) > self.thresholds['hip_movement_threshold']:
                     direction = "ABAJO (SENTARSE)" if hip_y_velocity > 0 else "ARRIBA (LEVANTARSE)"
                     print(f"{color}¡MOVIMIENTO CADERA {direction}! Velocidad={hip_y_velocity:.6f}\033[0m")
         
-        # Orientación para giros
+        
         if self.last_landmarks and 'left_shoulder' in landmarks and 'right_shoulder' in landmarks:
             shoulder_vector_current = {
                 'x': landmarks['left_shoulder']['x'] - landmarks['right_shoulder']['x'],
@@ -295,7 +295,7 @@ class SimpleActivityClassifier:
             print(f"GIRAR - Cambio de orientación: {orientation_change:.2f}° (Umbral 90°: > {self.thresholds['orientation_threshold']}°, Umbral 180°: > {self.thresholds['orientation_threshold_large']}°)")
             
             if orientation_change > self.thresholds['orientation_threshold']:
-                color = '\033[92m'  # verde
+                color = '\033[92m'  
                 giro_tipo = "GRANDE (180°)" if orientation_change > self.thresholds['orientation_threshold_large'] else "PEQUEÑO (90°)"
                 print(f"{color}¡GIRO {giro_tipo} DETECTADO! Ángulo={orientation_change:.2f}°\033[0m")
         

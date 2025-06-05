@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Sistema de Anotación de Video - Punto de Entrada Principal
 =========================================================
@@ -16,7 +16,7 @@ import sys
 import argparse
 from pathlib import Path
 
-# Agregar el directorio raíz del proyecto al path
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
@@ -33,20 +33,20 @@ def main(camera_id=None):
     print("=" * 60)
     
     try:
-        # Importar módulos del sistema (usando importaciones absolutas)
+        
         from src.gui.gui_app import main as start_gui
         from src.utils.camera_selector import select_camera
         
         print("✓ Módulos del sistema cargados correctamente")
         
-        # Seleccionar cámara si no se especifica
+        
         if camera_id is None:
             print("\nSeleccionando cámara...")
             camera_id = select_camera()
             
         print(f"✓ Cámara seleccionada: ID {camera_id}")
         
-        # Verificar que los modelos entrenados existen (opcional)
+        
         models_dir = Path("models")
         if models_dir.exists() and (models_dir / "trained_models").exists():
             print("✓ Modelos entrenados encontrados")
@@ -59,7 +59,7 @@ def main(camera_id=None):
         print("   - Ajusta umbrales desde el menú si es necesario")
         print("   - Para cerrar, usa Ctrl+C o cierra la ventana")
         
-        # Iniciar la interfaz gráfica
+        
         start_gui(camera_id)
         
     except ImportError as e:
@@ -85,13 +85,13 @@ if __name__ == "__main__":
         epilog="""
 Ejemplos de uso:
     
-    # Iniciar con selección automática de cámara
+    
     python src/main.py
     
-    # Especificar cámara específica
+    
     python src/main.py --camera_id 0
     
-    # Si necesitas entrenar modelos primero
+    
     python run_pipeline.py --quick_run
     python src/main.py
         """

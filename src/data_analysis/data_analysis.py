@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Análisis Exploratorio de Datos
 ==============================
@@ -33,11 +33,11 @@ from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
-# Agregar el directorio raíz del proyecto al path
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, project_root)
 
-# Estadísticas y análisis
+
 from scipy import stats
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -61,21 +61,21 @@ class DataAnalyzer:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Crear subdirectorios
+        
         (self.output_dir / "plots").mkdir(exist_ok=True)
         (self.output_dir / "statistics").mkdir(exist_ok=True)
         (self.output_dir / "reports").mkdir(exist_ok=True)
         
-        # Configurar estilo de plots
+        
         plt.style.use('seaborn-v0_8')
         sns.set_palette("husl")
         
-        # Datos
+        
         self.df = None
         self.feature_columns = None
         self.activity_column = 'activity'
         
-        # Resultados del análisis
+        
         self.analysis_results = {}
     
     def load_data(self, file_path=None):
@@ -88,7 +88,7 @@ class DataAnalyzer:
         print("=== Cargando datos para análisis ===")
         
         if file_path is None:
-            # Buscar archivo de datos automáticamente
+            
             possible_files = [
                 self.data_dir / "complete_dataset.csv",
                 self.data_dir / "processed" / "training_features.csv"
@@ -105,14 +105,14 @@ class DataAnalyzer:
         self.df = pd.read_csv(file_path)
         print(f"Datos cargados: {self.df.shape[0]} filas, {self.df.shape[1]} columnas")
         
-        # Identificar columnas de características
+        
         exclude_columns = ['video_path', 'frame_idx', 'timestamp', self.activity_column]
         self.feature_columns = [col for col in self.df.columns if col not in exclude_columns]
         
         print(f"Columnas de características: {len(self.feature_columns)}")
         print(f"Actividades encontradas: {self.df[self.activity_column].nunique()}")
         
-        # Información básica del dataset
+        
         self.analysis_results['basic_info'] = {
             'total_samples': len(self.df),
             'total_features': len(self.feature_columns),
@@ -126,7 +126,7 @@ class DataAnalyzer:
         """
         print("\n=== Análisis estadístico descriptivo ===")
         
-        # Estadísticas por actividad
+        
         activity_stats = {}
         
         for activity in self.df[self.activity_column].unique():
@@ -145,15 +145,15 @@ class DataAnalyzer:
         
         self.analysis_results['descriptive_stats'] = activity_stats
         
-        # Estadísticas generales
+        
         feature_stats = self.df[self.feature_columns].describe()
         
-        # Guardar estadísticas
+        
         stats_path = self.output_dir / "statistics" / "descriptive_stats.csv"
         feature_stats.to_csv(stats_path)
         print(f"Estadísticas descriptivas guardadas: {stats_path}")
         
-        # Crear visualización de distribuciones
+        
         self._plot_feature_distributions()
         
         return feature_stats
@@ -165,11 +165,11 @@ class DataAnalyzer:
         Args:
             max_features (int): Máximo número de características a mostrar
         """
-        # Seleccionar las características más importantes (con mayor varianza)
+        
         feature_vars = self.df[self.feature_columns].var().sort_values(ascending=False)
         top_features = feature_vars.head(max_features).index.tolist()
         
-        # Crear subplots
+        
         n_cols = 4
         n_rows = (len(top_features) + n_cols - 1) // n_cols
         
@@ -180,7 +180,7 @@ class DataAnalyzer:
             if i < len(axes):
                 ax = axes[i]
                 
-                # Histograma por actividad
+                
                 for activity in self.df[self.activity_column].unique():
                     activity_data = self.df[self.df[self.activity_column] == activity][feature]
                     ax.hist(activity_data, alpha=0.6, label=activity, bins=20)
@@ -190,7 +190,7 @@ class DataAnalyzer:
                 ax.set_ylabel('Frecuencia')
                 ax.legend()
         
-        # Ocultar ejes vacíos
+        
         for i in range(len(top_features), len(axes)):
             axes[i].set_visible(False)
         
@@ -207,10 +207,10 @@ class DataAnalyzer:
         """
         print("\n=== Análisis de correlaciones ===")
         
-        # Calcular matriz de correlación
+        
         correlation_matrix = self.df[self.feature_columns].corr()
         
-        # Encontrar correlaciones altas
+        
         high_corr_pairs = []
         threshold = 0.8
         
@@ -226,14 +226,14 @@ class DataAnalyzer:
         
         print(f"Encontradas {len(high_corr_pairs)} correlaciones altas (|r| > {threshold})")
         
-        # Guardar pares de alta correlación
+        
         if high_corr_pairs:
             corr_df = pd.DataFrame(high_corr_pairs)
             corr_path = self.output_dir / "statistics" / "high_correlations.csv"
             corr_df.to_csv(corr_path, index=False)
             print(f"Correlaciones altas guardadas: {corr_path}")
         
-        # Crear heatmap de correlaciones
+        
         self._plot_correlation_heatmap(correlation_matrix)
         
         self.analysis_results['correlation_analysis'] = {
@@ -252,9 +252,9 @@ class DataAnalyzer:
             correlation_matrix (DataFrame): Matriz de correlación
             max_features (int): Máximo número de características a mostrar
         """
-        # Seleccionar subconjunto si hay demasiadas características
+        
         if len(correlation_matrix) > max_features:
-            # Seleccionar características con mayor varianza
+            
             feature_vars = self.df[self.feature_columns].var().sort_values(ascending=False)
             top_features = feature_vars.head(max_features).index.tolist()
             correlation_subset = correlation_matrix.loc[top_features, top_features]
@@ -263,7 +263,7 @@ class DataAnalyzer:
         
         plt.figure(figsize=(15, 12))
         
-        # Crear heatmap
+        
         mask = np.triu(np.ones_like(correlation_subset, dtype=bool))
         sns.heatmap(
             correlation_subset,
@@ -293,7 +293,7 @@ class DataAnalyzer:
         
         outlier_results = {}
         
-        # Método IQR para detectar outliers
+        
         for feature in self.feature_columns:
             feature_data = self.df[feature].dropna()
             
@@ -313,21 +313,21 @@ class DataAnalyzer:
                 'upper_bound': upper_bound
             }
         
-        # Crear DataFrame con resultados de outliers
+        
         outlier_df = pd.DataFrame(outlier_results).T
         outlier_df = outlier_df.sort_values('percentage', ascending=False)
         
-        # Guardar resultados
+        
         outlier_path = self.output_dir / "statistics" / "outlier_analysis.csv"
         outlier_df.to_csv(outlier_path)
         print(f"Análisis de outliers guardado: {outlier_path}")
         
-        # Mostrar características con más outliers
+        
         top_outlier_features = outlier_df.head(10)
         print("Características con más outliers:")
         print(top_outlier_features[['count', 'percentage']].to_string())
         
-        # Crear visualización de outliers
+        
         self._plot_outliers(top_outlier_features.index.tolist()[:8])
         
         self.analysis_results['outlier_analysis'] = {
@@ -353,7 +353,7 @@ class DataAnalyzer:
             if i < len(axes):
                 ax = axes[i]
                 
-                # Boxplot por actividad
+                
                 activity_data = []
                 activity_labels = []
                 
@@ -366,11 +366,11 @@ class DataAnalyzer:
                 ax.set_title(f'Outliers en {feature}')
                 ax.set_ylabel('Valor')
                 
-                # Rotar etiquetas si es necesario
+                
                 if len(activity_labels) > 3:
                     ax.tick_params(axis='x', rotation=45)
         
-        # Ocultar ejes vacíos
+        
         for i in range(len(features), len(axes)):
             axes[i].set_visible(False)
         
@@ -387,7 +387,7 @@ class DataAnalyzer:
         """
         print("\n=== Comparación entre actividades ===")
         
-        # Análisis de varianza (ANOVA) para cada característica
+        
         anova_results = {}
         
         for feature in self.feature_columns:
@@ -412,16 +412,16 @@ class DataAnalyzer:
                         'significant': False
                     }
         
-        # Crear DataFrame con resultados ANOVA
+        
         anova_df = pd.DataFrame(anova_results).T
         anova_df = anova_df.sort_values('f_statistic', ascending=False)
         
-        # Guardar resultados
+        
         anova_path = self.output_dir / "statistics" / "anova_results.csv"
         anova_df.to_csv(anova_path)
         print(f"Resultados ANOVA guardados: {anova_path}")
         
-        # Características más discriminantes
+        
         significant_features = anova_df[anova_df['significant'] == True]
         print(f"Características significativamente diferentes entre actividades: {len(significant_features)}")
         
@@ -429,7 +429,7 @@ class DataAnalyzer:
             print("Top 10 características más discriminantes:")
             print(significant_features.head(10)[['f_statistic', 'p_value']].to_string())
             
-            # Crear visualización de comparación
+            
             self._plot_activity_comparison(significant_features.head(8).index.tolist())
         
         self.analysis_results['activity_comparison'] = {
@@ -455,7 +455,7 @@ class DataAnalyzer:
             if i < len(axes):
                 ax = axes[i]
                 
-                # Violin plot
+                
                 sns.violinplot(
                     data=self.df,
                     x=self.activity_column,
@@ -467,11 +467,11 @@ class DataAnalyzer:
                 ax.set_xlabel('Actividad')
                 ax.set_ylabel('Valor')
                 
-                # Rotar etiquetas si es necesario
+                
                 if len(self.df[self.activity_column].unique()) > 3:
                     ax.tick_params(axis='x', rotation=45)
         
-        # Ocultar ejes vacíos
+        
         for i in range(len(features), len(axes)):
             axes[i].set_visible(False)
         
@@ -488,29 +488,29 @@ class DataAnalyzer:
         """
         print("\n=== Análisis de dimensionalidad ===")
         
-        # Preparar datos (normalizar)
+        
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(self.df[self.feature_columns].fillna(0))
         
-        # PCA
+        
         pca = PCA()
         X_pca = pca.fit_transform(X_scaled)
         
-        # Calcular varianza explicada acumulada
+        
         cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
         
-        # Encontrar número de componentes para 95% de varianza
+        
         n_components_95 = np.argmax(cumulative_variance >= 0.95) + 1
         
         print(f"Componentes principales para 95% de varianza: {n_components_95}")
         
-        # Crear gráficos de PCA
+        
         self._plot_pca_analysis(pca, X_pca, cumulative_variance)
         
-        # t-SNE (solo si tenemos suficientes datos)
+        
         if len(self.df) > 100:
             print("Ejecutando t-SNE...")
-            # Usar solo las primeras componentes principales para t-SNE
+            
             n_components_tsne = min(50, n_components_95)
             X_pca_reduced = X_pca[:, :n_components_tsne]
             
@@ -536,14 +536,14 @@ class DataAnalyzer:
         """
         fig, axes = plt.subplots(2, 2, figsize=(15, 12))
         
-        # 1. Varianza explicada por componente
+        
         axes[0, 0].bar(range(1, min(21, len(pca.explained_variance_ratio_)+1)), 
                        pca.explained_variance_ratio_[:20])
         axes[0, 0].set_title('Varianza Explicada por Componente Principal')
         axes[0, 0].set_xlabel('Componente Principal')
         axes[0, 0].set_ylabel('Varianza Explicada')
         
-        # 2. Varianza explicada acumulada
+        
         axes[0, 1].plot(range(1, min(51, len(cumulative_variance)+1)), 
                        cumulative_variance[:50])
         axes[0, 1].axhline(y=0.95, color='r', linestyle='--', label='95%')
@@ -552,7 +552,7 @@ class DataAnalyzer:
         axes[0, 1].set_ylabel('Varianza Explicada Acumulada')
         axes[0, 1].legend()
         
-        # 3. Proyección en primeras 2 componentes
+        
         scatter = axes[1, 0].scatter(X_pca[:, 0], X_pca[:, 1], 
                                    c=pd.Categorical(self.df[self.activity_column]).codes,
                                    cmap='tab10', alpha=0.6)
@@ -560,13 +560,13 @@ class DataAnalyzer:
         axes[1, 0].set_xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.2%} varianza)')
         axes[1, 0].set_ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.2%} varianza)')
         
-        # Leyenda para actividades
+        
         activities = self.df[self.activity_column].unique()
         for i, activity in enumerate(activities):
             axes[1, 0].scatter([], [], c=plt.cm.tab10(i), label=activity)
         axes[1, 0].legend()
         
-        # 4. Proyección en PC2 vs PC3
+        
         if X_pca.shape[1] > 2:
             scatter = axes[1, 1].scatter(X_pca[:, 1], X_pca[:, 2], 
                                        c=pd.Categorical(self.df[self.activity_column]).codes,
@@ -602,7 +602,7 @@ class DataAnalyzer:
         plt.xlabel('t-SNE 1')
         plt.ylabel('t-SNE 2')
         
-        # Leyenda
+        
         activities = self.df[self.activity_column].unique()
         for i, activity in enumerate(activities):
             plt.scatter([], [], c=plt.cm.tab10(i), label=activity)
@@ -623,7 +623,7 @@ class DataAnalyzer:
         
         quality_report = {}
         
-        # 1. Valores faltantes
+        
         missing_data = self.df.isnull().sum()
         missing_percentage = (missing_data / len(self.df)) * 100
         
@@ -634,14 +634,14 @@ class DataAnalyzer:
             'worst_features': {k: float(v) for k, v in missing_percentage.nlargest(10).to_dict().items()}
         }
         
-        # 2. Duplicados
+        
         duplicates = self.df.duplicated()
         quality_report['duplicates'] = {
             'total_duplicates': int(duplicates.sum()),
             'percentage_duplicates': float((duplicates.sum() / len(self.df)) * 100)
         }
         
-        # 3. Valores constantes
+        
         constant_features = []
         for feature in self.feature_columns:
             if self.df[feature].nunique() <= 1:
@@ -652,24 +652,24 @@ class DataAnalyzer:
             'features': constant_features
         }
         
-        # 4. Distribución de clases
+        
         class_distribution = self.df[self.activity_column].value_counts()
         class_imbalance = class_distribution.max() / class_distribution.min()
         
         quality_report['class_distribution'] = {
             'class_counts': {k: int(v) for k, v in class_distribution.to_dict().items()},
             'imbalance_ratio': float(class_imbalance),
-            'is_balanced': bool(class_imbalance < 3)  # Ratio menor a 3 se considera balanceado
+            'is_balanced': bool(class_imbalance < 3)  
         }
         
-        # Guardar reporte de calidad
+        
         quality_path = self.output_dir / "statistics" / "data_quality_report.json"
         with open(quality_path, 'w') as f:
             json.dump(quality_report, f, indent=2)
         
         print(f"Reporte de calidad guardado: {quality_path}")
         
-        # Imprimir resumen
+        
         print(f"Valores faltantes: {quality_report['missing_data']['total_missing_values']}")
         print(f"Duplicados: {quality_report['duplicates']['total_duplicates']}")
         print(f"Características constantes: {quality_report['constant_features']['count']}")
@@ -683,7 +683,7 @@ class DataAnalyzer:
         """
         print("\n=== Generando reporte de análisis ===")
         
-        # Crear reporte completo
+        
         full_report = {
             'analysis_info': {
                 'timestamp': datetime.now().isoformat(),
@@ -694,12 +694,12 @@ class DataAnalyzer:
             'analysis_results': self.analysis_results
         }
         
-        # Guardar reporte JSON
+        
         report_path = self.output_dir / "reports" / "analysis_report.json"
         with open(report_path, 'w') as f:
             json.dump(full_report, f, indent=2)
         
-        # Crear reporte en texto
+        
         text_report_path = self.output_dir / "reports" / "analysis_report.txt"
         with open(text_report_path, 'w') as f:
             f.write("REPORTE DE ANÁLISIS EXPLORATORIO DE DATOS\n")
@@ -708,7 +708,7 @@ class DataAnalyzer:
             f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"Datos analizados: {self.data_dir}\n\n")
             
-            # Información básica
+            
             if 'basic_info' in self.analysis_results:
                 info = self.analysis_results['basic_info']
                 f.write("INFORMACIÓN BÁSICA DEL DATASET:\n")
@@ -720,7 +720,7 @@ class DataAnalyzer:
                     f.write(f"  * {activity}: {count}\n")
                 f.write("\n")
             
-            # Calidad de datos
+            
             if 'data_quality' in self.analysis_results:
                 quality = self.analysis_results['data_quality']
                 f.write("CALIDAD DE DATOS:\n")
@@ -730,14 +730,14 @@ class DataAnalyzer:
                 f.write(f"- Ratio de desbalance: {quality['class_distribution']['imbalance_ratio']:.2f}\n")
                 f.write(f"- Dataset balanceado: {'Sí' if quality['class_distribution']['is_balanced'] else 'No'}\n\n")
             
-            # Análisis de correlaciones
+            
             if 'correlation_analysis' in self.analysis_results:
                 corr = self.analysis_results['correlation_analysis']
                 f.write("ANÁLISIS DE CORRELACIONES:\n")
                 f.write(f"- Correlaciones altas encontradas: {corr['high_correlation_count']}\n")
                 f.write(f"- Umbral usado: {corr['correlation_threshold']}\n\n")
             
-            # Comparación de actividades
+            
             if 'activity_comparison' in self.analysis_results:
                 comp = self.analysis_results['activity_comparison']
                 f.write("COMPARACIÓN ENTRE ACTIVIDADES:\n")
@@ -749,7 +749,7 @@ class DataAnalyzer:
                         f.write(f"  * {feature}\n")
                 f.write("\n")
             
-            # Análisis de dimensionalidad
+            
             if 'dimensionality_analysis' in self.analysis_results:
                 dim = self.analysis_results['dimensionality_analysis']
                 f.write("ANÁLISIS DE DIMENSIONALIDAD:\n")
@@ -776,14 +776,14 @@ def main():
     
     args = parser.parse_args()
     
-    # Crear analizador
+    
     analyzer = DataAnalyzer(args.data_dir, args.output_dir)
     
     try:
-        # Cargar datos
+        
         analyzer.load_data(args.data_file)
         
-        # Ejecutar análisis
+        
         print("Iniciando análisis exploratorio...")
         
         analyzer.descriptive_statistics()
@@ -793,7 +793,7 @@ def main():
         analyzer.dimensionality_analysis()
         analyzer.data_quality_assessment()
         
-        # Generar reporte
+        
         analyzer.generate_analysis_report()
         
         print(f"\n¡Análisis completado exitosamente!")

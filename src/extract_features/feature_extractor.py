@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Feature Extractor Mejorado
 =========================
@@ -16,7 +16,7 @@ class FeatureExtractor:
         """Inicializa el extractor de características."""
         self.prev_landmarks = None
         self.frame_count = 0
-        self.temporal_window = 5  # Ventana temporal para cálculos
+        self.temporal_window = 5  
         self.landmark_history = []
         
     def _calculate_angle(self, p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> float:
@@ -75,20 +75,20 @@ class FeatureExtractor:
         """
         features = {}
         
-        # 1. Ángulos Articulares
-        # Rodillas
+        
+        
         features['right_knee_angle'] = self._calculate_angle(
             landmarks['right_hip'], landmarks['right_knee'], landmarks['right_ankle'])
         features['left_knee_angle'] = self._calculate_angle(
             landmarks['left_hip'], landmarks['left_knee'], landmarks['left_ankle'])
         
-        # Caderas
+        
         features['right_hip_angle'] = self._calculate_angle(
             landmarks['right_shoulder'], landmarks['right_hip'], landmarks['right_knee'])
         features['left_hip_angle'] = self._calculate_angle(
             landmarks['left_shoulder'], landmarks['left_hip'], landmarks['left_knee'])
         
-        # Tronco
+        
         features['trunk_forward_tilt'] = self._calculate_angle(
             landmarks['nose'], 
             (landmarks['left_hip'] + landmarks['right_hip']) / 2,
@@ -101,7 +101,7 @@ class FeatureExtractor:
             landmarks['right_shoulder']
         )
         
-        # 2. Velocidades Articulares
+        
         if self.prev_landmarks is not None:
             for joint in ['knee', 'hip', 'ankle', 'shoulder']:
                 for side in ['left', 'right']:
@@ -111,8 +111,8 @@ class FeatureExtractor:
                         self.prev_landmarks[key]
                     )
         
-        # 3. Características de Movimiento Global
-        # Centro de masa aproximado (COM)
+        
+        
         com = np.mean([landmarks['left_hip'], landmarks['right_hip']], axis=0)
         if self.prev_landmarks is not None:
             prev_com = np.mean([
@@ -124,18 +124,18 @@ class FeatureExtractor:
             features['vertical_movement'] = com[1] - prev_com[1]
             features['forward_movement'] = com[2] - prev_com[2]
         
-        # 4. Características de Simetría
+        
         features['knee_angle_symmetry'] = abs(
             features['right_knee_angle'] - features['left_knee_angle'])
         features['hip_angle_symmetry'] = abs(
             features['right_hip_angle'] - features['left_hip_angle'])
         
-        # 5. Características Temporales
+        
         self.landmark_history.append(landmarks)
         if len(self.landmark_history) > self.temporal_window:
             self.landmark_history.pop(0)
             
-            # Variación temporal de ángulos
+            
             for joint in ['knee', 'hip']:
                 for side in ['left', 'right']:
                     angles = [
@@ -148,11 +148,11 @@ class FeatureExtractor:
                     ]
                     features[f'{side}_{joint}_angle_variance'] = np.var(angles)
         
-        # 6. Visibilidad de Landmarks
+        
         for key in landmarks:
             features[f'{key}_visibility'] = landmarks[key][3] if len(landmarks[key]) > 3 else 1.0
         
-        # Actualizar estado
+        
         self.prev_landmarks = landmarks.copy()
         self.frame_count += 1
         
@@ -166,28 +166,28 @@ class FeatureExtractor:
             List[str]: Lista de nombres de características
         """
         return [
-            # Ángulos
+            
             'right_knee_angle', 'left_knee_angle',
             'right_hip_angle', 'left_hip_angle',
             'trunk_forward_tilt', 'trunk_lateral_tilt',
             
-            # Velocidades
+            
             'right_knee_velocity', 'left_knee_velocity',
             'right_hip_velocity', 'left_hip_velocity',
             'right_ankle_velocity', 'left_ankle_velocity',
             'right_shoulder_velocity', 'left_shoulder_velocity',
             
-            # Movimiento Global
+            
             'com_velocity', 'vertical_movement', 'forward_movement',
             
-            # Simetría
+            
             'knee_angle_symmetry', 'hip_angle_symmetry',
             
-            # Variaciones Temporales
+            
             'right_knee_angle_variance', 'left_knee_angle_variance',
             'right_hip_angle_variance', 'left_hip_angle_variance',
             
-            # Visibilidad
+            
             'right_knee_visibility', 'left_knee_visibility',
             'right_hip_visibility', 'left_hip_visibility',
             'right_ankle_visibility', 'left_ankle_visibility',

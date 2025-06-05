@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Entrenador de Modelos de Clasificación
 =====================================
@@ -32,11 +32,11 @@ from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
-# Agregar el directorio raíz del proyecto al path
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, project_root)
 
-# Machine Learning
+
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -47,7 +47,7 @@ from sklearn.metrics import (classification_report, confusion_matrix, accuracy_s
                            precision_recall_fscore_support, roc_auc_score)
 from sklearn.feature_selection import SelectKBest, f_classif, RFE
 
-# XGBoost (si está disponible)
+
 try:
     import xgboost as xgb
     XGBOOST_AVAILABLE = True
@@ -72,18 +72,18 @@ class ActivityClassifierTrainer:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Crear subdirectorios
+        
         (self.output_dir / "trained_models").mkdir(exist_ok=True)
         (self.output_dir / "evaluation").mkdir(exist_ok=True)
         (self.output_dir / "plots").mkdir(exist_ok=True)
         (self.output_dir / "feature_analysis").mkdir(exist_ok=True)
         
-        # Configuración de modelos
+        
         self.models = self._setup_models()
         self.scaler = StandardScaler()
         self.label_encoder = LabelEncoder()
         
-        # Datos y resultados
+        
         self.X_train = None
         self.X_test = None
         self.y_train = None
@@ -126,7 +126,7 @@ class ActivityClassifierTrainer:
                     'C': [0.01, 0.1, 1, 10, 100],
                     'penalty': ['l1', 'l2', 'elasticnet'],
                     'solver': ['liblinear', 'saga'],
-                    'l1_ratio': [0.1, 0.5, 0.9]  # Solo para elasticnet
+                    'l1_ratio': [0.1, 0.5, 0.9]  
                 }
             },
             'GradientBoosting': {
@@ -149,7 +149,7 @@ class ActivityClassifierTrainer:
             }
         }
         
-        # Agregar XGBoost si está disponible
+        
         if XGBOOST_AVAILABLE:
             models['XGBoost'] = {
                 'model': xgb.XGBClassifier(random_state=42, eval_metric='mlogloss'),
@@ -174,7 +174,7 @@ class ActivityClassifierTrainer:
         print("=== Cargando datos de entrenamiento ===")
         
         if file_path is None:
-            # Buscar archivo de datos automáticamente
+            
             possible_files = [
                 self.data_dir / "processed" / "training_features.csv",
                 self.data_dir / "complete_dataset.csv"
@@ -188,15 +188,15 @@ class ActivityClassifierTrainer:
         
         print(f"Cargando datos desde: {file_path}")
         
-        # Cargar datos
+        
         df = pd.read_csv(file_path)
         print(f"Datos cargados: {df.shape[0]} muestras, {df.shape[1]} columnas")
         
-        # Verificar que existe la columna de actividad
+        
         if 'activity' not in df.columns:
             raise ValueError("El dataset debe contener una columna 'activity'")
         
-        # Separar características y etiquetas
+        
         feature_columns = [col for col in df.columns 
                           if col not in ['activity', 'video_path', 'frame_idx', 'timestamp']]
         
@@ -208,27 +208,27 @@ class ActivityClassifierTrainer:
         print("Distribución de clases:")
         print(y.value_counts())
         
-        # Manejar valores faltantes
+        
         print(f"\nValores faltantes por columna:")
         missing_counts = X.isnull().sum()
         missing_columns = missing_counts[missing_counts > 0]
         
         if len(missing_columns) > 0:
             print(missing_columns)
-            # Rellenar con la mediana para características numéricas
+            
             X = X.fillna(X.median())
             print("Valores faltantes rellenados con la mediana")
         else:
             print("No hay valores faltantes")
         
-        # Guardar nombres de características y clases
+        
         self.feature_names = feature_columns
         self.class_names = sorted(y.unique())
         
-        # Codificar etiquetas
+        
         y_encoded = self.label_encoder.fit_transform(y)
         
-        # Dividir en entrenamiento y prueba
+        
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded
         )
@@ -237,13 +237,13 @@ class ActivityClassifierTrainer:
         print(f"Entrenamiento: {self.X_train.shape[0]} muestras")
         print(f"Prueba: {self.X_test.shape[0]} muestras")
         
-        # Escalar características
+        
         self.X_train_scaled = self.scaler.fit_transform(self.X_train)
         self.X_test_scaled = self.scaler.transform(self.X_test)
         
         print("Características escaladas con StandardScaler")
         
-        # Guardar el scaler y label encoder
+        
         scaler_path = self.output_dir / "trained_models" / "scaler.joblib"
         encoder_path = self.output_dir / "trained_models" / "label_encoder.joblib"
         
@@ -262,19 +262,19 @@ class ActivityClassifierTrainer:
         """
         print(f"\n=== Selección de características (top {n_features}) ===")
         
-        # Selección univariada
+        
         selector = SelectKBest(score_func=f_classif, k=min(n_features, len(self.feature_names)))
         X_train_selected = selector.fit_transform(self.X_train_scaled, self.y_train)
         X_test_selected = selector.transform(self.X_test_scaled)
         
-        # Obtener características seleccionadas
+        
         selected_features = selector.get_support(indices=True)
         selected_feature_names = [self.feature_names[i] for i in selected_features]
         feature_scores = selector.scores_[selected_features]
         
         print(f"Características seleccionadas: {len(selected_feature_names)}")
         
-        # Guardar información de características seleccionadas
+        
         feature_info = {
             'selected_features': selected_feature_names,
             'feature_scores': feature_scores.tolist(),
@@ -287,12 +287,12 @@ class ActivityClassifierTrainer:
         
         print(f"Información de características guardada: {feature_info_path}")
         
-        # Actualizar datos de entrenamiento
+        
         self.X_train_scaled = X_train_selected
         self.X_test_scaled = X_test_selected
         self.feature_names = selected_feature_names
         
-        # Crear gráfico de importancia de características
+        
         self._plot_feature_importance(selected_feature_names, feature_scores, "Feature Selection Scores")
     
     def train_models(self, use_grid_search=True, cv_folds=5):
@@ -312,7 +312,7 @@ class ActivityClassifierTrainer:
             
             try:
                 if use_grid_search:
-                    # Optimización de hiperparámetros con Grid Search
+                    
                     grid_search = GridSearchCV(
                         model_config['model'],
                         model_config['params'],
@@ -329,25 +329,25 @@ class ActivityClassifierTrainer:
                     print(f"Mejor score CV: {grid_search.best_score_:.4f}")
                     
                 else:
-                    # Entrenar con parámetros por defecto
+                    
                     best_model = model_config['model']
                     best_model.fit(self.X_train_scaled, self.y_train)
                 
-                # Guardar modelo entrenado
+                
                 self.trained_models[model_name] = best_model
                 
-                # Evaluación
+                
                 train_score = best_model.score(self.X_train_scaled, self.y_train)
                 test_score = best_model.score(self.X_test_scaled, self.y_test)
                 
-                # Validación cruzada
+                
                 cv_scores = cross_val_score(best_model, self.X_train_scaled, self.y_train, cv=cv)
                 
                 print(f"Score entrenamiento: {train_score:.4f}")
                 print(f"Score prueba: {test_score:.4f}")
                 print(f"CV Score medio: {cv_scores.mean():.4f} (+/- {cv_scores.std() * 2:.4f})")
                 
-                # Guardar modelo
+                
                 model_path = self.output_dir / "trained_models" / f"{model_name}.joblib"
                 joblib.dump(best_model, model_path)
                 print(f"Modelo guardado: {model_path}")
@@ -365,14 +365,14 @@ class ActivityClassifierTrainer:
         for model_name, model in self.trained_models.items():
             print(f"\n--- Evaluación de {model_name} ---")
             
-            # Predicciones
+            
             y_pred = model.predict(self.X_test_scaled)
             y_pred_proba = None
             
             if hasattr(model, "predict_proba"):
                 y_pred_proba = model.predict_proba(self.X_test_scaled)
             
-            # Métricas básicas
+            
             accuracy = accuracy_score(self.y_test, y_pred)
             precision, recall, f1, support = precision_recall_fscore_support(
                 self.y_test, y_pred, average='weighted'
@@ -383,17 +383,17 @@ class ActivityClassifierTrainer:
             print(f"Recall: {recall:.4f}")
             print(f"F1-Score: {f1:.4f}")
             
-            # Reporte de clasificación detallado
+            
             class_report = classification_report(
                 self.y_test, y_pred,
                 target_names=self.class_names,
                 output_dict=True
             )
             
-            # Matriz de confusión
+            
             conf_matrix = confusion_matrix(self.y_test, y_pred)
             
-            # Guardar resultados
+            
             self.evaluation_results[model_name] = {
                 'accuracy': accuracy,
                 'precision': precision,
@@ -408,10 +408,10 @@ class ActivityClassifierTrainer:
             if y_pred_proba is not None:
                 self.evaluation_results[model_name]['prediction_probabilities'] = y_pred_proba.tolist()
             
-            # Crear visualizaciones
+            
             self._plot_confusion_matrix(conf_matrix, model_name)
             
-            # Análisis de importancia de características (si está disponible)
+            
             if hasattr(model, 'feature_importances_'):
                 self._plot_feature_importance(
                     self.feature_names, 
@@ -419,14 +419,14 @@ class ActivityClassifierTrainer:
                     f"{model_name} Feature Importance"
                 )
         
-        # Guardar todas las evaluaciones
+        
         evaluation_path = self.output_dir / "evaluation" / "model_evaluation_results.json"
         with open(evaluation_path, 'w') as f:
             json.dump(self.evaluation_results, f, indent=2)
         
         print(f"\nResultados de evaluación guardados: {evaluation_path}")
         
-        # Crear comparación de modelos
+        
         self._create_model_comparison()
     
     def _plot_confusion_matrix(self, conf_matrix, model_name):
@@ -466,10 +466,10 @@ class ActivityClassifierTrainer:
             importance_scores (array): Scores de importancia
             title (str): Título del gráfico
         """
-        # Ordenar por importancia
+        
         indices = np.argsort(importance_scores)[::-1]
         
-        # Tomar top 20 características
+        
         top_n = min(20, len(feature_names))
         
         plt.figure(figsize=(12, 8))
@@ -480,7 +480,7 @@ class ActivityClassifierTrainer:
         plt.ylabel('Importancia')
         plt.tight_layout()
         
-        # Nombre del archivo basado en el título
+        
         file_name = title.lower().replace(' ', '_').replace('-', '_') + '.png'
         plot_path = self.output_dir / "plots" / file_name
         plt.savefig(plot_path, dpi=300, bbox_inches='tight')
@@ -495,14 +495,14 @@ class ActivityClassifierTrainer:
         if not self.evaluation_results:
             return
         
-        # Extraer métricas para comparación
+        
         models = list(self.evaluation_results.keys())
         accuracies = [self.evaluation_results[m]['accuracy'] for m in models]
         precisions = [self.evaluation_results[m]['precision'] for m in models]
         recalls = [self.evaluation_results[m]['recall'] for m in models]
         f1_scores = [self.evaluation_results[m]['f1_score'] for m in models]
         
-        # Crear DataFrame para comparación
+        
         comparison_df = pd.DataFrame({
             'Model': models,
             'Accuracy': accuracies,
@@ -511,11 +511,11 @@ class ActivityClassifierTrainer:
             'F1-Score': f1_scores
         })
         
-        # Guardar tabla de comparación
+        
         comparison_path = self.output_dir / "evaluation" / "model_comparison.csv"
         comparison_df.to_csv(comparison_path, index=False)
         
-        # Crear gráfico de comparación
+        
         fig, axes = plt.subplots(2, 2, figsize=(15, 12))
         fig.suptitle('Comparación de Modelos', fontsize=16)
         
@@ -528,12 +528,12 @@ class ActivityClassifierTrainer:
             ax.set_ylabel(metric)
             ax.set_ylim(0, 1)
             
-            # Agregar valores en las barras
+            
             for bar, value in zip(bars, comparison_df[metric]):
                 ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01,
                        f'{value:.3f}', ha='center', va='bottom')
             
-            # Rotar etiquetas si es necesario
+            
             if len(models) > 3:
                 ax.tick_params(axis='x', rotation=45)
         
@@ -546,18 +546,18 @@ class ActivityClassifierTrainer:
         print(f"Comparación de modelos guardada: {comparison_path}")
         print(f"Gráfico de comparación guardado: {comparison_plot_path}")
         
-        # Imprimir resumen
+        
         print("\n=== RESUMEN DE MODELOS ===")
         print(comparison_df.to_string(index=False, float_format='%.4f'))
         
-        # Identificar mejor modelo
+        
         best_model_idx = comparison_df['F1-Score'].idxmax()
         best_model = comparison_df.iloc[best_model_idx]['Model']
         best_f1 = comparison_df.iloc[best_model_idx]['F1-Score']
         
         print(f"\nMejor modelo: {best_model} (F1-Score: {best_f1:.4f})")
         
-        # Guardar información del mejor modelo
+        
         best_model_info = {
             'best_model': best_model,
             'metrics': comparison_df.iloc[best_model_idx].to_dict(),
@@ -591,7 +591,7 @@ class ActivityClassifierTrainer:
             'evaluation_summary': {}
         }
         
-        # Agregar resumen de evaluación
+        
         for model_name, results in self.evaluation_results.items():
             report['evaluation_summary'][model_name] = {
                 'accuracy': results['accuracy'],
@@ -600,14 +600,14 @@ class ActivityClassifierTrainer:
                 'f1_score': results['f1_score']
             }
         
-        # Guardar reporte
+        
         report_path = self.output_dir / "training_report.json"
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=2)
         
         print(f"Reporte de entrenamiento guardado: {report_path}")
         
-        # Crear reporte en texto
+        
         text_report_path = self.output_dir / "training_report.txt"
         with open(text_report_path, 'w') as f:
             f.write("REPORTE DE ENTRENAMIENTO - SISTEMA DE ANOTACIÓN DE VIDEO\n")
@@ -654,26 +654,26 @@ def main():
     
     args = parser.parse_args()
     
-    # Crear entrenador
+    
     trainer = ActivityClassifierTrainer(args.data_dir, args.output_dir)
     
     try:
-        # Cargar datos
+        
         trainer.load_data(args.data_file)
         
-        # Selección de características
+        
         trainer.feature_selection(args.n_features)
         
-        # Entrenar modelos
+        
         trainer.train_models(
             use_grid_search=not args.no_grid_search,
             cv_folds=args.cv_folds
         )
         
-        # Evaluar modelos
+        
         trainer.evaluate_models()
         
-        # Generar reporte
+        
         trainer.generate_training_report()
         
         print(f"\n¡Entrenamiento completado exitosamente!")

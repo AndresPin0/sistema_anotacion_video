@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Extractor de Características de Video
 ====================================
@@ -29,7 +29,7 @@ import json
 from tqdm import tqdm
 import time
 
-# Agregar el directorio raíz del proyecto al path
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, project_root)
 
@@ -51,12 +51,12 @@ class VideoFeatureExtractor:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Crear subdirectorios
+        
         (self.output_dir / "raw").mkdir(exist_ok=True)
         (self.output_dir / "processed").mkdir(exist_ok=True)
         (self.output_dir / "statistics").mkdir(exist_ok=True)
         
-        # Inicializar detector de poses
+        
         self.pose_detector = PoseDetector(
             static_image_mode=False,
             model_complexity=1,
@@ -65,7 +65,7 @@ class VideoFeatureExtractor:
             min_tracking_confidence=0.5
         )
         
-        # Mapeo de actividades
+        
         self.activity_mapping = {
             "caminar_hacia": "caminarHacia",
             "caminar_regreso": "caminarRegreso", 
@@ -75,7 +75,7 @@ class VideoFeatureExtractor:
             "ponerse_de_pie": "ponerseDePie"
         }
         
-        # Lista para almacenar todas las características extraídas
+        
         self.all_features = []
         self.extraction_stats = {
             "total_videos": 0,
@@ -105,7 +105,7 @@ class VideoFeatureExtractor:
             print(f"Error: No se pudo abrir el video {video_path}")
             return []
         
-        # Obtener información del video
+        
         fps = cap.get(cv2.CAP_PROP_FPS)
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         duration = total_frames / fps if fps > 0 else 0
@@ -116,10 +116,10 @@ class VideoFeatureExtractor:
         frame_idx = 0
         successful_detections = 0
         
-        # Historial para calcular características temporales
+        
         landmark_history = []
         angle_history = []
-        history_length = 5  # Ventana para características temporales
+        history_length = 5  
         
         pbar = tqdm(total=min(total_frames, max_frames or total_frames), 
                    desc=f"Procesando {Path(video_path).name}")
@@ -132,42 +132,42 @@ class VideoFeatureExtractor:
             if max_frames and frame_idx >= max_frames:
                 break
             
-            # Procesar frame con MediaPipe
+            
             results_dict, processed_frame = self.pose_detector.process_frame(frame, frame_idx)
             
             if results_dict and results_dict.get("landmarks"):
-                # Extraer características básicas
+                
                 landmarks = results_dict["landmarks"]
                 angles = results_dict.get("angles", {})
                 
-                # Crear diccionario de características para este frame
+                
                 frame_features = {
-                    # Metadatos
+                    
                     "video_path": str(video_path),
                     "activity": activity_label,
                     "frame_idx": frame_idx,
                     "timestamp": frame_idx / fps if fps > 0 else frame_idx,
                     
-                    # Características de landmarks (coordenadas normalizadas)
+                    
                     **self._extract_landmark_features(landmarks),
                     
-                    # Características de ángulos articulares
+                    
                     **self._extract_angle_features(angles),
                     
-                    # Características geométricas
+                    
                     **self._extract_geometric_features(landmarks),
                 }
                 
-                # Agregar al historial para características temporales
+                
                 landmark_history.append(landmarks)
                 angle_history.append(angles)
                 
-                # Mantener solo los últimos N frames
+                
                 if len(landmark_history) > history_length:
                     landmark_history.pop(0)
                     angle_history.pop(0)
                 
-                # Calcular características temporales si tenemos suficiente historial
+                
                 if len(landmark_history) >= 2:
                     temporal_features = self._extract_temporal_features(
                         landmark_history, angle_history, fps
@@ -200,7 +200,7 @@ class VideoFeatureExtractor:
         """
         features = {}
         
-        # Coordenadas normalizadas de puntos clave
+        
         key_points = [
             "nose", "left_shoulder", "right_shoulder",
             "left_hip", "right_hip", "left_knee", "right_knee",
@@ -214,7 +214,7 @@ class VideoFeatureExtractor:
                 features[f"{point}_z"] = landmarks[point]["z"]
                 features[f"{point}_visibility"] = landmarks[point]["visibility"]
             else:
-                # Valores por defecto si no se detecta el punto
+                
                 features[f"{point}_x"] = 0.0
                 features[f"{point}_y"] = 0.0
                 features[f"{point}_z"] = 0.0
@@ -234,7 +234,7 @@ class VideoFeatureExtractor:
         """
         features = {}
         
-        # Ángulos principales
+        
         angle_keys = [
             "left_knee_angle", "right_knee_angle",
             "left_hip_angle", "right_hip_angle", 
@@ -246,9 +246,9 @@ class VideoFeatureExtractor:
             if angle_key in angles:
                 features[angle_key] = angles[angle_key]
             else:
-                features[angle_key] = 0.0  # Valor por defecto
+                features[angle_key] = 0.0  
         
-        # Características derivadas
+        
         if "left_knee_angle" in angles and "right_knee_angle" in angles:
             features["avg_knee_angle"] = (angles["left_knee_angle"] + angles["right_knee_angle"]) / 2
             features["knee_angle_diff"] = abs(angles["left_knee_angle"] - angles["right_knee_angle"])
@@ -267,7 +267,7 @@ class VideoFeatureExtractor:
         """
         features = {}
         
-        # Distancias entre puntos clave
+        
         if "left_shoulder" in landmarks and "right_shoulder" in landmarks:
             shoulder_dist = np.sqrt(
                 (landmarks["left_shoulder"]["x"] - landmarks["right_shoulder"]["x"])**2 +
@@ -284,7 +284,7 @@ class VideoFeatureExtractor:
             )
             features["hip_width"] = hip_dist
         
-        # Centro de masa corporal (aproximado)
+        
         if all(k in landmarks for k in ["left_shoulder", "right_shoulder", "left_hip", "right_hip"]):
             center_x = (landmarks["left_shoulder"]["x"] + landmarks["right_shoulder"]["x"] + 
                        landmarks["left_hip"]["x"] + landmarks["right_hip"]["x"]) / 4
@@ -316,23 +316,23 @@ class VideoFeatureExtractor:
         if len(landmark_history) < 2:
             return features
         
-        # Calcular velocidades (cambio entre frames consecutivos)
+        
         current_landmarks = landmark_history[-1]
         previous_landmarks = landmark_history[-2]
         
-        dt = 1.0 / fps if fps > 0 else 1.0  # Tiempo entre frames
+        dt = 1.0 / fps if fps > 0 else 1.0  
         
-        # Velocidades de puntos clave
+        
         key_points = ["nose", "left_hip", "right_hip", "left_knee", "right_knee"]
         
         for point in key_points:
             if point in current_landmarks and point in previous_landmarks:
-                # Velocidad en cada eje
+                
                 vx = (current_landmarks[point]["x"] - previous_landmarks[point]["x"]) / dt
                 vy = (current_landmarks[point]["y"] - previous_landmarks[point]["y"]) / dt
                 vz = (current_landmarks[point]["z"] - previous_landmarks[point]["z"]) / dt
                 
-                # Velocidad total
+                
                 v_total = np.sqrt(vx**2 + vy**2 + vz**2)
                 
                 features[f"{point}_velocity_x"] = vx
@@ -340,7 +340,7 @@ class VideoFeatureExtractor:
                 features[f"{point}_velocity_z"] = vz
                 features[f"{point}_velocity_total"] = v_total
         
-        # Velocidad angular (cambio en ángulos)
+        
         if len(angle_history) >= 2:
             current_angles = angle_history[-1]
             previous_angles = angle_history[-2]
@@ -350,9 +350,9 @@ class VideoFeatureExtractor:
                     angular_velocity = (current_angles[angle_key] - previous_angles[angle_key]) / dt
                     features[f"{angle_key}_velocity"] = angular_velocity
         
-        # Características de tendencia (si tenemos suficiente historial)
+        
         if len(landmark_history) >= 3:
-            # Aceleración (cambio en velocidad)
+            
             older_landmarks = landmark_history[-3]
             
             for point in key_points:
@@ -360,17 +360,17 @@ class VideoFeatureExtractor:
                     point in previous_landmarks and 
                     point in older_landmarks):
                     
-                    # Velocidad actual
+                    
                     vx_current = (current_landmarks[point]["x"] - previous_landmarks[point]["x"]) / dt
                     vy_current = (current_landmarks[point]["y"] - previous_landmarks[point]["y"]) / dt
                     vz_current = (current_landmarks[point]["z"] - previous_landmarks[point]["z"]) / dt
                     
-                    # Velocidad anterior
+                    
                     vx_previous = (previous_landmarks[point]["x"] - older_landmarks[point]["x"]) / dt
                     vy_previous = (previous_landmarks[point]["y"] - older_landmarks[point]["y"]) / dt
                     vz_previous = (previous_landmarks[point]["z"] - older_landmarks[point]["z"]) / dt
                     
-                    # Aceleración
+                    
                     ax = (vx_current - vx_previous) / dt
                     ay = (vy_current - vy_previous) / dt
                     az = (vz_current - vz_previous) / dt
@@ -400,7 +400,7 @@ class VideoFeatureExtractor:
             print(f"Advertencia: La carpeta {activity_path} no existe")
             return []
         
-        # Buscar archivos de video
+        
         video_extensions = ['.mp4', '.avi', '.mov', '.mkv', '.wmv']
         video_files = []
         for ext in video_extensions:
@@ -410,7 +410,7 @@ class VideoFeatureExtractor:
             print(f"No se encontraron videos en {activity_path}")
             return []
         
-        # Limitar número de videos si se especifica
+        
         if max_videos:
             video_files = video_files[:max_videos]
         
@@ -420,7 +420,7 @@ class VideoFeatureExtractor:
         activity_label = self.activity_mapping.get(activity_folder, activity_folder)
         all_activity_features = []
         
-        # Procesar cada video
+        
         for video_file in video_files:
             self.extraction_stats["total_videos"] += 1
             
@@ -436,7 +436,7 @@ class VideoFeatureExtractor:
                     self.extraction_stats["successful_extractions"] += 1
                     self.extraction_stats["total_frames_processed"] += len(video_features)
                     
-                    # Guardar características del video individual
+                    
                     video_name = video_file.stem
                     output_file = self.output_dir / "raw" / f"{activity_folder}_{video_name}_features.csv"
                     
@@ -451,7 +451,7 @@ class VideoFeatureExtractor:
                 self.extraction_stats["failed_extractions"] += 1
                 print(f"  - Error procesando {video_file}: {str(e)}")
         
-        # Actualizar estadísticas por actividad
+        
         if activity_label not in self.extraction_stats["activities_count"]:
             self.extraction_stats["activities_count"][activity_label] = 0
         self.extraction_stats["activities_count"][activity_label] += len(all_activity_features)
@@ -477,7 +477,7 @@ class VideoFeatureExtractor:
         if not video_dir_path.exists():
             raise FileNotFoundError(f"El directorio {video_dir} no existe")
         
-        # Buscar carpetas de actividades
+        
         activity_folders = [d.name for d in video_dir_path.iterdir() 
                            if d.is_dir() and d.name in self.activity_mapping]
         
@@ -486,7 +486,7 @@ class VideoFeatureExtractor:
         
         print(f"Actividades encontradas: {activity_folders}")
         
-        # Procesar cada actividad
+        
         for activity_folder in activity_folders:
             activity_features = self.process_activity_folder(
                 video_dir, 
@@ -496,7 +496,7 @@ class VideoFeatureExtractor:
             )
             self.all_features.extend(activity_features)
         
-        # Guardar dataset completo
+        
         if self.all_features:
             self._save_complete_dataset()
             self._generate_statistics()
@@ -508,15 +508,15 @@ class VideoFeatureExtractor:
         """Guarda el dataset completo con todas las características."""
         print("\nGuardando dataset completo...")
         
-        # Crear DataFrame con todas las características
+        
         df = pd.DataFrame(self.all_features)
         
-        # Guardar archivo principal
+        
         main_output = self.output_dir / "complete_dataset.csv"
         df.to_csv(main_output, index=False)
         print(f"Dataset completo guardado: {main_output}")
         
-        # Guardar versión procesada (sin metadatos de video)
+        
         feature_columns = [col for col in df.columns 
                           if col not in ["video_path", "frame_idx", "timestamp"]]
         
@@ -525,7 +525,7 @@ class VideoFeatureExtractor:
         processed_df.to_csv(processed_output, index=False)
         print(f"Características de entrenamiento guardadas: {processed_output}")
         
-        # Guardar separado por actividad
+        
         for activity in df["activity"].unique():
             activity_df = df[df["activity"] == activity]
             activity_output = self.output_dir / "processed" / f"{activity}_features.csv"
@@ -541,7 +541,7 @@ class VideoFeatureExtractor:
         
         df = pd.DataFrame(self.all_features)
         
-        # Estadísticas básicas
+        
         stats = {
             "extraction_info": self.extraction_stats,
             "dataset_info": {
@@ -553,14 +553,14 @@ class VideoFeatureExtractor:
             "feature_statistics": {}
         }
         
-        # Calcular promedio de frames por video
+        
         if self.extraction_stats["successful_extractions"] > 0:
             stats["extraction_info"]["average_frames_per_video"] = (
                 self.extraction_stats["total_frames_processed"] / 
                 self.extraction_stats["successful_extractions"]
             )
         
-        # Estadísticas de características numéricas
+        
         numeric_columns = df.select_dtypes(include=[np.number]).columns
         for col in numeric_columns:
             if col not in ["frame_idx", "timestamp"]:
@@ -572,14 +572,14 @@ class VideoFeatureExtractor:
                     "missing_values": int(df[col].isna().sum())
                 }
         
-        # Guardar estadísticas
+        
         stats_output = self.output_dir / "statistics" / "extraction_stats.json"
         with open(stats_output, 'w') as f:
             json.dump(stats, f, indent=2)
         
         print(f"Estadísticas guardadas: {stats_output}")
         
-        # Imprimir resumen
+        
         print("\n=== RESUMEN DE EXTRACCIÓN ===")
         print(f"Videos procesados: {self.extraction_stats['successful_extractions']}/{self.extraction_stats['total_videos']}")
         print(f"Total de muestras extraídas: {len(df)}")
@@ -599,11 +599,11 @@ def main():
     
     args = parser.parse_args()
     
-    # Crear extractor
+    
     extractor = VideoFeatureExtractor(args.output_dir)
     
     try:
-        # Procesar todos los videos
+        
         extractor.process_all_videos(
             video_dir=args.video_dir,
             max_videos_per_activity=args.max_videos,

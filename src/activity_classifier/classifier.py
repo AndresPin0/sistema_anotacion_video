@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Clasificador de Actividades Mejorado
 ==================================
@@ -30,10 +30,10 @@ class ActivityClassifier:
         """Inicializa el clasificador de actividades."""
         self.model = None
         self.scaler = None
-        self.detection_buffer = []  # Buffer para suavizado temporal
-        self.buffer_size = 5  # Tamaño del buffer para promediado
-        self.confidence_threshold = 0.85  # Umbral de confianza mínimo
-        self.temporal_smoothing = True  # Habilitar suavizado temporal
+        self.detection_buffer = []  
+        self.buffer_size = 5  
+        self.confidence_threshold = 0.85  
+        self.temporal_smoothing = True  
         self.load_models()
         
     def load_models(self, model_path: str = "models/trained_models") -> None:
@@ -62,11 +62,11 @@ class ActivityClassifier:
         Returns:
             np.ndarray: Características preprocesadas
         """
-        # Convertir diccionario a array
+        
         feature_names = sorted(features.keys())
         feature_vector = np.array([features[name] for name in feature_names]).reshape(1, -1)
         
-        # Aplicar scaling si está disponible
+        
         if self.scaler is not None:
             feature_vector = self.scaler.transform(feature_vector)
             
@@ -81,25 +81,25 @@ class ActivityClassifier:
         Returns:
             Tuple[str, float]: (actividad predicha, confianza)
         """
-        # Reglas mejoradas basadas en características biomecánicas
         
-        # Detectar sentarse
+        
+        
         if (features.get('vertical_movement', 0) < -0.15 and 
             features.get('trunk_forward_tilt', 90) > 100):
             return 'sentarse', 0.8
             
-        # Detectar ponerse de pie
+        
         if (features.get('vertical_movement', 0) > 0.15 and 
             features.get('trunk_forward_tilt', 90) < 80):
             return 'ponerse_pie', 0.8
             
-        # Detectar giros
+        
         if abs(features.get('trunk_lateral_tilt', 0) - 90) > 45:
             if abs(features.get('trunk_lateral_tilt', 0) - 90) > 80:
                 return 'girar_180', 0.75
             return 'girar_90', 0.75
             
-        # Detectar caminata
+        
         if abs(features.get('forward_movement', 0)) > 0.1:
             if features.get('forward_movement', 0) > 0:
                 return 'caminar_hacia', 0.7
@@ -116,45 +116,45 @@ class ActivityClassifier:
         Returns:
             Tuple[str, float]: (actividad predicha, confianza)
         """
-        # Preprocesar características
+        
         X = self.preprocess_features(features)
         
         try:
             if self.model is not None:
-                # Predicción con XGBoost
+                
                 dmatrix = xgb.DMatrix(X)
                 probabilities = self.model.predict(dmatrix)
                 
-                # Obtener predicción y confianza
+                
                 pred_idx = np.argmax(probabilities)
                 confidence = float(probabilities[pred_idx])
                 
                 if confidence >= self.confidence_threshold:
                     prediction = self.ACTIVITIES[pred_idx]
                 else:
-                    # Si la confianza es baja, usar clasificación basada en reglas
+                    
                     prediction, confidence = self._rule_based_classification(features)
                     
             else:
-                # Fallback a clasificación basada en reglas
+                
                 prediction, confidence = self._rule_based_classification(features)
                 
         except Exception as e:
             print(f"⚠️  Error en clasificación: {e}")
             prediction, confidence = self._rule_based_classification(features)
         
-        # Aplicar suavizado temporal si está habilitado
+        
         if self.temporal_smoothing:
             self.detection_buffer.append((prediction, confidence))
             if len(self.detection_buffer) > self.buffer_size:
                 self.detection_buffer.pop(0)
             
-            # Promedio ponderado por confianza
+            
             if len(self.detection_buffer) >= 3:
                 predictions = [p for p, _ in self.detection_buffer]
                 confidences = [c for _, c in self.detection_buffer]
                 
-                # Si hay una predicción dominante con alta confianza
+                
                 unique_preds, counts = np.unique(predictions, return_counts=True)
                 max_count_idx = np.argmax(counts)
                 

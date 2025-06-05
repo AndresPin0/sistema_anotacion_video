@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Generador de Gráficos para Informe Técnico
 ==========================================
@@ -15,7 +15,7 @@ import pandas as pd
 from pathlib import Path
 import json
 
-# Configurar estilo
+
 plt.style.use('default')
 sns.set_palette("husl")
 
@@ -23,20 +23,20 @@ def create_architecture_diagram():
     """Crea un diagrama de la arquitectura del sistema"""
     fig, ax = plt.subplots(1, 1, figsize=(14, 8))
     
-    # Definir posiciones de los componentes
+    
     components = [
-        {"name": "Video Input\n(Camera)", "pos": (1, 4), "color": "#3498db", "size": (1.5, 1)},
-        {"name": "MediaPipe\nPose Detection", "pos": (3.5, 4), "color": "#e74c3c", "size": (1.5, 1)},
-        {"name": "Feature\nExtraction", "pos": (6, 4), "color": "#f39c12", "size": (1.5, 1)},
-        {"name": "ML Model\n(LogisticRegression)", "pos": (8.5, 4), "color": "#2ecc71", "size": (1.5, 1)},
-        {"name": "Activity\nClassification", "pos": (11, 4), "color": "#9b59b6", "size": (1.5, 1)},
+        {"name": "Video Input\n(Camera)", "pos": (1, 4), "color": "
+        {"name": "MediaPipe\nPose Detection", "pos": (3.5, 4), "color": "
+        {"name": "Feature\nExtraction", "pos": (6, 4), "color": "
+        {"name": "ML Model\n(LogisticRegression)", "pos": (8.5, 4), "color": "
+        {"name": "Activity\nClassification", "pos": (11, 4), "color": "
         
-        {"name": "33 Landmarks", "pos": (3.5, 2.5), "color": "#ecf0f1", "size": (1.2, 0.6)},
-        {"name": "101 Features", "pos": (6, 2.5), "color": "#ecf0f1", "size": (1.2, 0.6)},
-        {"name": "6 Activities", "pos": (11, 2.5), "color": "#ecf0f1", "size": (1.2, 0.6)},
+        {"name": "33 Landmarks", "pos": (3.5, 2.5), "color": "
+        {"name": "101 Features", "pos": (6, 2.5), "color": "
+        {"name": "6 Activities", "pos": (11, 2.5), "color": "
     ]
     
-    # Dibujar componentes
+    
     for comp in components:
         rect = mpatches.Rectangle(
             (comp["pos"][0] - comp["size"][0]/2, comp["pos"][1] - comp["size"][1]/2),
@@ -45,21 +45,21 @@ def create_architecture_diagram():
         )
         ax.add_patch(rect)
         
-        # Texto
+        
         ax.text(comp["pos"][0], comp["pos"][1], comp["name"], 
                 ha='center', va='center', fontweight='bold', fontsize=10,
-                color='white' if comp["color"] != "#ecf0f1" else 'black')
+                color='white' if comp["color"] != "
     
-    # Dibujar flechas
+    
     arrows = [
-        ((2.25, 4), (2.75, 4)),  # Video -> MediaPipe
-        ((4.75, 4), (5.25, 4)),  # MediaPipe -> Feature
-        ((7.25, 4), (7.75, 4)),  # Feature -> ML
-        ((9.75, 4), (10.25, 4)), # ML -> Classification
+        ((2.25, 4), (2.75, 4)),  
+        ((4.75, 4), (5.25, 4)),  
+        ((7.25, 4), (7.75, 4)),  
+        ((9.75, 4), (10.25, 4)), 
         
-        ((3.5, 3.5), (3.5, 3.1)), # MediaPipe -> Landmarks
-        ((6, 3.5), (6, 3.1)),     # Feature -> Features
-        ((11, 3.5), (11, 3.1)),   # Classification -> Activities
+        ((3.5, 3.5), (3.5, 3.1)), 
+        ((6, 3.5), (6, 3.1)),     
+        ((11, 3.5), (11, 3.1)),   
     ]
     
     for start, end in arrows:
@@ -78,7 +78,7 @@ def create_architecture_diagram():
 
 def create_performance_comparison():
     """Crea gráfico de comparación de rendimiento de modelos"""
-    # Datos de rendimiento (de nuestros resultados reales)
+    
     models = ['Logistic\nRegression', 'Gradient\nBoosting', 'XGBoost', 'SVM', 'KNN', 'Random\nForest']
     accuracy = [69.46, 67.57, 67.03, 66.49, 66.49, 65.41]
     precision = [69.30, 67.57, 67.05, 65.99, 65.64, 65.63]
@@ -90,10 +90,10 @@ def create_performance_comparison():
     
     fig, ax = plt.subplots(figsize=(12, 8))
     
-    bars1 = ax.bar(x - 1.5*width, accuracy, width, label='Accuracy', color='#3498db', alpha=0.8)
-    bars2 = ax.bar(x - 0.5*width, precision, width, label='Precision', color='#e74c3c', alpha=0.8)
-    bars3 = ax.bar(x + 0.5*width, recall, width, label='Recall', color='#f39c12', alpha=0.8)
-    bars4 = ax.bar(x + 1.5*width, f1_score, width, label='F1-Score', color='#2ecc71', alpha=0.8)
+    bars1 = ax.bar(x - 1.5*width, accuracy, width, label='Accuracy', color='
+    bars2 = ax.bar(x - 0.5*width, precision, width, label='Precision', color='
+    bars3 = ax.bar(x + 0.5*width, recall, width, label='Recall', color='
+    bars4 = ax.bar(x + 1.5*width, f1_score, width, label='F1-Score', color='
     
     ax.set_xlabel('Modelos de Machine Learning', fontsize=12, fontweight='bold')
     ax.set_ylabel('Rendimiento (%)', fontsize=12, fontweight='bold')
@@ -104,7 +104,7 @@ def create_performance_comparison():
     ax.grid(True, alpha=0.3)
     ax.set_ylim(60, 75)
     
-    # Agregar valores en las barras
+    
     def autolabel(rects):
         for rect in rects:
             height = rect.get_height()
@@ -115,7 +115,7 @@ def create_performance_comparison():
                        ha='center', va='bottom', fontsize=8)
     
     autolabel(bars1)
-    autolabel(bars4)  # Solo mostrar accuracy y f1-score para no saturar
+    autolabel(bars4)  
     
     plt.tight_layout()
     plt.savefig('reports/rendimiento_modelos.png', dpi=300, bbox_inches='tight')
@@ -123,7 +123,7 @@ def create_performance_comparison():
 
 def create_feature_importance_plot():
     """Crea gráfico de importancia de características"""
-    # Top características más importantes (basado en nuestros resultados)
+    
     features = [
         'right_knee_angle', 'right_knee_visibility', 'right_hip_angle',
         'left_knee_angle', 'trunk_lateral_inclination', 'left_hip_angle',
@@ -140,7 +140,7 @@ def create_feature_importance_plot():
     plt.title('Top 10 Características Más Importantes', fontsize=16, fontweight='bold')
     plt.gca().invert_yaxis()
     
-    # Agregar valores
+    
     for i, (bar, val) in enumerate(zip(bars, importance)):
         plt.text(val + 0.002, bar.get_y() + bar.get_height()/2, 
                 f'{val:.3f}', va='center', fontweight='bold')
@@ -157,7 +157,7 @@ def create_activity_distribution():
     
     plt.figure(figsize=(10, 6))
     
-    colors = ['#e74c3c', '#c0392b', '#3498db', '#2ecc71', '#27ae60', '#2980b9']
+    colors = ['
     bars = plt.bar(activities, counts, color=colors, alpha=0.8)
     
     plt.xlabel('Actividades', fontsize=12, fontweight='bold')
@@ -165,12 +165,12 @@ def create_activity_distribution():
     plt.title('Distribución de Actividades en el Dataset', fontsize=16, fontweight='bold')
     plt.xticks(rotation=45)
     
-    # Agregar valores en las barras
+    
     for bar, count in zip(bars, counts):
         plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5,
                 str(count), ha='center', va='bottom', fontweight='bold')
     
-    # Línea de promedio
+    
     avg = np.mean(counts)
     plt.axhline(y=avg, color='red', linestyle='--', alpha=0.7, 
                 label=f'Promedio: {avg:.0f} muestras')
@@ -183,22 +183,22 @@ def create_activity_distribution():
 
 def create_confusion_matrix_summary():
     """Crea un resumen visual de la matriz de confusión del mejor modelo"""
-    # Matriz de confusión aproximada para LogisticRegression (simulada basada en F1-score)
+    
     activities = ['Caminar\nHacia', 'Caminar\nRegreso', 'Girar\n90°', 'Girar\n180°', 'Sentarse', 'Ponerse\nde Pie']
     
-    # Matriz simulada (valores aproximados basados en nuestro rendimiento)
+    
     cm = np.array([
-        [45, 3, 2, 1, 4, 2],   # Caminar Hacia
-        [4, 41, 1, 2, 3, 2],   # Caminar Regreso
-        [2, 1, 48, 8, 1, 2],   # Girar 90°
-        [1, 2, 7, 52, 1, 1],   # Girar 180°
-        [3, 2, 1, 1, 43, 8],   # Sentarse
-        [2, 3, 2, 1, 9, 45]    # Ponerse de Pie
+        [45, 3, 2, 1, 4, 2],   
+        [4, 41, 1, 2, 3, 2],   
+        [2, 1, 48, 8, 1, 2],   
+        [1, 2, 7, 52, 1, 1],   
+        [3, 2, 1, 1, 43, 8],   
+        [2, 3, 2, 1, 9, 45]    
     ])
     
     plt.figure(figsize=(10, 8))
     
-    # Normalizar por filas para obtener porcentajes
+    
     cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
     
     sns.heatmap(cm_percent, annot=True, fmt='.1f', cmap='Blues',
@@ -217,7 +217,7 @@ def create_confusion_matrix_summary():
 
 def main():
     """Función principal para generar todos los gráficos"""
-    # Crear directorio de reportes
+    
     Path('reports').mkdir(exist_ok=True)
     
     print("Generando gráficos para el informe técnico...")

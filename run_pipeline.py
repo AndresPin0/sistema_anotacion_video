@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Pipeline Completo del Sistema de Anotación de Video
 ===================================================
@@ -42,7 +42,7 @@ class PipelineRunner:
         self.models_dir = Path(models_dir)
         self.analysis_dir = Path(analysis_dir)
         
-        # Estado del pipeline
+        
         self.steps_completed = []
         self.start_time = None
         
@@ -52,11 +52,11 @@ class PipelineRunner:
         """
         print("=== Verificando prerequisitos ===")
         
-        # Verificar que existe el directorio de videos
+        
         if not self.video_dir.exists():
             raise FileNotFoundError(f"Directorio de videos no encontrado: {self.video_dir}")
         
-        # Verificar que hay videos en las carpetas de actividades
+        
         activity_folders = ["caminar_hacia", "caminar_regreso", "girar_90", 
                            "girar_180", "sentarse", "ponerse_de_pie"]
         
@@ -73,7 +73,7 @@ class PipelineRunner:
         
         print(f"Total de videos encontrados: {videos_found}")
         
-        # Verificar que los scripts principales existen (en su nueva ubicación)
+        
         required_scripts = [
             "src/extract_features/extract_video_features.py", 
             "src/train_classifier/train_classifier.py", 
@@ -120,7 +120,7 @@ class PipelineRunner:
         print(f"✓ Extracción completada en {end_time - start_time:.1f}s")
         self.steps_completed.append("feature_extraction")
         
-        # Mostrar resumen de la salida
+        
         print("\nResumen de extracción:")
         output_lines = result.stdout.split('\n')
         for line in output_lines:
@@ -153,7 +153,7 @@ class PipelineRunner:
         print(f"✓ Análisis completado en {end_time - start_time:.1f}s")
         self.steps_completed.append("data_analysis")
         
-        # Mostrar resumen
+        
         print("\nAnálisis generado:")
         print(f"  - Reportes: {self.analysis_dir}/reports/")
         print(f"  - Gráficos: {self.analysis_dir}/plots/")
@@ -194,13 +194,13 @@ class PipelineRunner:
         print(f"✓ Entrenamiento completado en {end_time - start_time:.1f}s")
         self.steps_completed.append("model_training")
         
-        # Mostrar resumen de resultados
+        
         print("\nModelos entrenados:")
         print(f"  - Modelos: {self.models_dir}/trained_models/")
         print(f"  - Evaluación: {self.models_dir}/evaluation/")
         print(f"  - Gráficos: {self.models_dir}/plots/")
         
-        # Intentar mostrar el mejor modelo
+        
         best_model_file = self.models_dir / "evaluation" / "best_model_info.json"
         if best_model_file.exists():
             import json
@@ -234,19 +234,19 @@ class PipelineRunner:
         self.start_time = time.time()
         
         try:
-            # Verificar prerequisitos
+            
             self.check_prerequisites()
             
-            # Paso 1: Extracción de características
+            
             self.run_feature_extraction(max_videos, max_frames)
             
-            # Paso 2: Análisis de datos
+            
             self.run_data_analysis()
             
-            # Paso 3: Entrenamiento de modelos
+            
             self.run_model_training(quick_run=quick_run)
             
-            # Resumen final
+            
             self.print_final_summary()
             
         except Exception as e:
@@ -295,16 +295,16 @@ def main():
         epilog="""
 Ejemplos de uso:
     
-    # Ejecutar pipeline completo
+    
     python run_pipeline.py
     
-    # Ejecutar en modo rápido (sin Grid Search)
+    
     python run_pipeline.py --quick_run
     
-    # Ejecutar con límites para pruebas
+    
     python run_pipeline.py --max_videos 2 --max_frames 100 --quick_run
     
-    # Especificar directorios personalizados
+    
     python run_pipeline.py --video_dir mi_videos --models_dir mis_modelos
         """
     )
@@ -325,7 +325,7 @@ Ejemplos de uso:
     parser.add_argument("--max_frames", type=int,
                        help="Máximo número de frames por video (para pruebas)")
     
-    # Pasos individuales
+    
     parser.add_argument("--only_extract", action="store_true",
                        help="Solo ejecutar extracción de características")
     parser.add_argument("--only_analyze", action="store_true",
@@ -335,7 +335,7 @@ Ejemplos de uso:
     
     args = parser.parse_args()
     
-    # Crear ejecutor del pipeline
+    
     pipeline = PipelineRunner(
         video_dir=args.video_dir,
         data_dir=args.data_dir,
@@ -344,10 +344,10 @@ Ejemplos de uso:
     )
     
     try:
-        # Verificar prerequisitos básicos
+        
         pipeline.check_prerequisites()
         
-        # Ejecutar pasos individuales si se especifica
+        
         if args.only_extract:
             pipeline.run_feature_extraction(args.max_videos, args.max_frames)
         elif args.only_analyze:
@@ -355,7 +355,7 @@ Ejemplos de uso:
         elif args.only_train:
             pipeline.run_model_training(args.quick_run)
         else:
-            # Ejecutar pipeline completo
+            
             success = pipeline.run_complete_pipeline(
                 quick_run=args.quick_run,
                 max_videos=args.max_videos,
