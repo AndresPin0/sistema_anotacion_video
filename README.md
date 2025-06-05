@@ -9,6 +9,10 @@
 
 Un sistema completo para la detección y clasificación de actividades humanas en tiempo real utilizando MediaPipe y técnicas de aprendizaje automático.
 
+## 🎬 Presentación en vídeo
+
+[![Presentación en vídeo](https://img.youtube.com/vi/2BeW1TyJGks/0.jpg)](https://youtu.be/2BeW1TyJGks)
+
 ## 📋 Descripción del Proyecto
 
 Este sistema permite analizar videos en tiempo real para detectar y clasificar las siguientes actividades:
